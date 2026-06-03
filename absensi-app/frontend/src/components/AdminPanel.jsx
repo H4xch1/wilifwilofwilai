@@ -159,11 +159,14 @@ export default function AdminPanel({ activePanel }) {
       nik: formData.get('nik_edit'),
       nis: formData.get('nis_edit') || null,
       tanggal_lahir: formData.get('tanggal_lahir_edit') || null,
-      role: formData.get('role_edit'),
-      wali_kelas_id: formData.get('wali_kelas_id_edit') || null,
     };
     const password = formData.get('password_edit');
     if (password && password.trim() !== '') data.password = password;
+
+    // Hanya jika mengedit siswa (manage-siswa), kirim wali_kelas_id
+    if (activePanel === 'manage-siswa') {
+      data.wali_kelas_id = formData.get('wali_kelas_id_edit') || null;
+    }
 
     try {
       await api.put(`/users/${editData._id}`, data);
@@ -275,7 +278,6 @@ export default function AdminPanel({ activePanel }) {
           <div className="stat-card"><div><h3>Wali Kelas</h3><div className="number">{stats.walas}</div></div><i className="fas fa-chalkboard-user stat-icon"></i></div>
           <div className="stat-card"><div><h3>Admin</h3><div className="number">{stats.admin}</div></div><i className="fas fa-user-shield stat-icon"></i></div>
         </div>
-        {/* Full width chart dengan tinggi 200px agar tidak panjang ke bawah */}
         <div style={{ padding: '0 28px 24px 28px' }}>
           <div className="stat-card" style={{ padding: '0', border: 'none', boxShadow: 'none', backgroundColor: 'transparent' }}>
             <canvas ref={chartRef} style={{ width: '100%', height: '200px' }}></canvas>
@@ -313,21 +315,20 @@ export default function AdminPanel({ activePanel }) {
               <div className="form-group"><label>NIK</label><input type="text" name="nik_edit" defaultValue={editData.nik} required /></div>
               <div className="form-group"><label>NIS</label><input type="text" name="nis_edit" defaultValue={editData.nis || ''} /></div>
               <div className="form-group"><label>Tgl Lahir</label><input type="date" name="tanggal_lahir_edit" defaultValue={editData.tanggal_lahir ? editData.tanggal_lahir.split('T')[0] : ''} /></div>
-              <div className="form-group"><label>Role</label>
-                <select name="role_edit" defaultValue={editData.role}>
-                  <option value="murid">Siswa</option>
-                  <option value="petugas">Petugas</option>
-                  <option value="walas">Wali Kelas</option>
-                  <option value="admin">Admin</option>
-                </select>
-              </div>
-              <div className="form-group" style={{ display: editData.role === 'murid' ? 'block' : 'none' }}>
-                <label>Wali Kelas</label>
-                <select name="wali_kelas_id_edit" defaultValue={editData.wali_kelas_id || ''}>
-                  <option value="">-- Tidak punya --</option>
-                  {walasList.map(w => <option key={w._id} value={w._id}>{w.nama_lengkap}</option>)}
-                </select>
-              </div>
+              
+              {/* Role tidak ditampilkan karena tidak boleh diubah dari manage per role */}
+              
+              {/* Hanya tampilkan wali kelas jika activePanel === 'manage-siswa' */}
+              {activePanel === 'manage-siswa' && (
+                <div className="form-group">
+                  <label>Wali Kelas</label>
+                  <select name="wali_kelas_id_edit" defaultValue={editData.wali_kelas_id || ''}>
+                    <option value="">-- Tidak punya --</option>
+                    {walasList.map(w => <option key={w._id} value={w._id}>{w.nama_lengkap}</option>)}
+                  </select>
+                </div>
+              )}
+              
               <div className="form-group"><label>Password (kosongkan jika tidak diubah)</label><input type="password" name="password_edit" /></div>
               <button type="submit" className="btn-submit">Simpan</button>
             </form>

@@ -16,7 +16,7 @@ export default function Login({ setUser }) {
     setLoading(true);
     setError('');
     try {
-      const res = await axios.post(`http://localhost:5000/api/auth/login`, { nik, password });
+      const res = await axios.post(`${import.meta.env.VITE_API_URL}/auth/login`, { nik, password });
       localStorage.setItem('token', res.data.token);
       localStorage.setItem('user', JSON.stringify(res.data.user));
       setUser(res.data.user);
@@ -33,7 +33,6 @@ export default function Login({ setUser }) {
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
-      // Dikasih opacity dikit di gradient biar GIF Chisa-nya makin hidup
       backgroundImage: `linear-gradient(135deg, rgba(17, 153, 142, 0.8) 0%, rgba(56, 239, 125, 0.8) 100%), url("images/Chisa.gif")`,
       backgroundSize: 'cover',
       backgroundPosition: 'center',
@@ -43,7 +42,6 @@ export default function Login({ setUser }) {
         display: 'flex',
         maxWidth: '1000px',
         width: '100%',
-        // 1. BACKROUND TRANSPARAN (Pake RGBA + Backdrop Filter Efek Kaca)
         background: 'rgba(0, 0, 0, 0.7)', 
         borderRadius: '32px',
         overflow: 'hidden',
@@ -51,7 +49,6 @@ export default function Login({ setUser }) {
         backdropFilter: 'blur(12px)',
         WebkitBackdropFilter: 'blur(12px)'
       }}>
-        {/* Sisi Kiri (Welcome Text) */}
         <div style={{
           flex: 1,
           background: 'linear-gradient(145deg, rgba(0, 0, 0, 0.5) 0%, rgba(15, 23, 42, 0.3) 100%)',
@@ -68,7 +65,6 @@ export default function Login({ setUser }) {
           <p style={{ color: '#cbd5e1' }}>Masuk ke dashboard<br />Sistem Absensi Cerdas</p>
         </div>
 
-        {/* Sisi Kanan (Form Input) */}
         <div style={{ flex: 1, padding: '3rem' }}>
           <h1 style={{
             fontSize: '2rem',
@@ -90,7 +86,6 @@ export default function Login({ setUser }) {
 
           <form onSubmit={handleSubmit}>
             <div className="form-group" style={{ marginBottom: '1.5rem' }}>
-              {/* 2. LABEL PUTIH ABU-ABU BIAR KELIHATAN CLEAN */}
               <label style={{ color: '#e2e8f0', display: 'block', marginBottom: '0.5rem', fontWeight: '500' }}>
                 <i className="fas fa-id-card" style={{ color: '#38ef7d', marginRight: '5px' }}></i> NIK
               </label>
@@ -98,14 +93,12 @@ export default function Login({ setUser }) {
             </div>
 
             <div className="form-group" style={{ marginBottom: '2rem' }}>
-              {/* LABEL PUTIH AGAK GREY */}
               <label style={{ color: '#e2e8f0', display: 'block', marginBottom: '0.5rem', fontWeight: '500' }}>
                 <i className="fas fa-lock" style={{ color: '#38ef7d', marginRight: '5px' }}></i> Password
               </label>
               <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="••••••" required style={{ width: '100%', padding: '12px', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.2)', background: 'rgba(255,255,255,0.1)', color: 'white' }} />
             </div>
 
-            {/* FIX TYPO CAMELCASE: borderRadius, fontSize, fontWeight */}
             <button type="submit" disabled={loading} style={{ width: '100%', background: 'linear-gradient(135deg, #11998e, #38ef7d)', color: 'white', border: 'none', padding: '14px', borderRadius: '40px', fontSize: '1rem', fontWeight: '600', cursor: 'pointer', boxShadow: '0 4px 15px rgba(56, 239, 125, 0.3)' }}>
               {loading ? 'Loading...' : <><i className="fas fa-arrow-right-to-bracket"></i> Masuk</>}
             </button>

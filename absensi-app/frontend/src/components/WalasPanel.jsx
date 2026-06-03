@@ -23,10 +23,11 @@ export default function WalasPanel({ activePanel }) {
   const [riwayatLaporan, setRiwayatLaporan] = useState([]);
   const [absensiSiswa, setAbsensiSiswa] = useState([]);
   const [viewingSiswa, setViewingSiswa] = useState(null);
-  const [showAbsensi, setShowAbsensi] = useState(false); // state untuk toggle tampilan
+  const [showAbsensi, setShowAbsensi] = useState(false);
   const [profil, setProfil] = useState(null);
   const [loading, setLoading] = useState(false);
 
+  // Mock data hanya untuk fallback
   const mockSiswa = [
     { _id: '1', nama_lengkap: 'Budi Santoso', nis: '12345' },
     { _id: '2', nama_lengkap: 'Siti Aminah', nis: '12346' }
@@ -103,7 +104,7 @@ export default function WalasPanel({ activePanel }) {
       setAbsensiSiswa(data);
       const siswa = siswaList.find(s => s._id === siswaId);
       setViewingSiswa(siswa);
-      setShowAbsensi(true); // Tampilkan rekap absensi, sembunyikan daftar siswa
+      setShowAbsensi(true);
     } catch (err) {
       console.error('Gagal ambil absensi, pakai mock', err);
       setAbsensiSiswa(mockAbsensi);
@@ -115,7 +116,7 @@ export default function WalasPanel({ activePanel }) {
   };
 
   const handleBackToSiswa = () => {
-    setShowAbsensi(false); // Kembali ke daftar siswa bimbingan
+    setShowAbsensi(false);
     setViewingSiswa(null);
     setAbsensiSiswa([]);
   };
@@ -130,7 +131,6 @@ export default function WalasPanel({ activePanel }) {
     if (activePanel === 'profil-walas') {
       fetchProfil();
     }
-    // Reset tampilan rekap absensi setiap kali pindah panel
     setShowAbsensi(false);
     setViewingSiswa(null);
   }, [activePanel]);
@@ -155,10 +155,8 @@ export default function WalasPanel({ activePanel }) {
     );
   }
 
-  // PANEL SISWA BIMBINGAN (tampilkan daftar siswa jika showAbsensi false)
   if (activePanel === 'siswa-bimbingan') {
     if (showAbsensi) {
-      // Tampilan rekap absensi untuk siswa yang dipilih
       return (
         <div className="panel active-panel">
           <h2>Rekap Absensi</h2>
@@ -188,7 +186,7 @@ export default function WalasPanel({ activePanel }) {
       );
     }
 
-    // Tampilan daftar siswa bimbingan
+    // TAMPILAN DAFTAR SISWA BIMBINGAN (diperbaiki kontrasnya)
     return (
       <div className="panel active-panel">
         <h2>Siswa Bimbingan</h2>
@@ -196,10 +194,28 @@ export default function WalasPanel({ activePanel }) {
         {!loading && siswaList.length === 0 && <div className="alert alert-info">Belum ada siswa bimbingan.</div>}
         {!loading && siswaList.length > 0 && (
           siswaList.map(siswa => (
-            <div key={siswa._id} style={{ background: '#f1f5f9', padding: '12px', borderRadius: '20px', marginBottom: '10px' }}>
-              <strong>{siswa.nama_lengkap}</strong> (NIS: {siswa.nis || '-'})
+            <div
+              key={siswa._id}
+              style={{
+                background: '#1e293b',        // latar gelap kontras
+                padding: '12px 16px',
+                borderRadius: '8px',
+                marginBottom: '12px',
+                borderLeft: '3px solid #f5c518'
+              }}
+            >
+              <strong style={{ color: '#f5c518', fontSize: '15px' }}>{siswa.nama_lengkap}</strong>
+              <span style={{ color: '#94a3b8', fontSize: '13px', marginLeft: '8px' }}>
+                (NIS: {siswa.nis || '-'})
+              </span>
               <br />
-              <button className="btn-edit-small" onClick={() => handleLihatAbsensi(siswa._id)}>Look Absensi</button>
+              <button
+                className="btn-edit-small"
+                onClick={() => handleLihatAbsensi(siswa._id)}
+                style={{ marginTop: '8px' }}
+              >
+                Lihat Absensi
+              </button>
             </div>
           ))
         )}
@@ -207,7 +223,6 @@ export default function WalasPanel({ activePanel }) {
     );
   }
 
-  // PANEL KIRIM LAPORAN
   if (activePanel === 'kirim-laporan') {
     return (
       <div className="panel active-panel">
@@ -237,7 +252,6 @@ export default function WalasPanel({ activePanel }) {
     );
   }
 
-  // PANEL RIWAYAT LAPORAN
   if (activePanel === 'riwayat-laporan') {
     return (
       <div className="panel active-panel">
@@ -270,7 +284,6 @@ export default function WalasPanel({ activePanel }) {
     );
   }
 
-  // PANEL PROFIL WALI KELAS
   if (activePanel === 'profil-walas') {
     return (
       <div className="panel active-panel">

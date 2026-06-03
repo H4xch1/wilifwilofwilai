@@ -7,14 +7,27 @@ const router = express.Router();
 
 router.post('/', verifyToken, checkRole('walas'), async (req, res) => {
   try {
+    // Pastikan kita ambil ID yang bener dari token
+    const walasId = req.user.id || req.user._id || req.user.userId;
+
+    if (!walasId) {
+        return res.status(401).json({ message: "Token lu gak ada ID-nya, bray!" });
+    }
+
     const { siswa_id, judul, deskripsi } = req.body;
+    console.log(req.user)
     const laporan = new LaporanKasus({
-      walas_id: req.user.userId, siswa_id, judul, deskripsi,
+      walas_id: walasId, // Pake variabel yang udah kita amanin
+      siswa_id, 
+      judul, 
+      deskripsi,
       tanggal: new Date().toISOString().split('T')[0]
     });
+    
     await laporan.save();
-    res.status(201).json({ message: 'Laporan kasus berhasil dikirim ke petugas' });
+    res.status(201).json({ message: 'Laporan sukses!' });
   } catch (error) {
+    console.error("Backend Error:", error);
     res.status(500).json({ message: error.message });
   }
 });

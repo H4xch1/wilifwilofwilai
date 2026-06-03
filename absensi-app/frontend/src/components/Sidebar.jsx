@@ -32,7 +32,6 @@ export default function Sidebar({ user, activePanel, setActivePanel }) {
       { id: 'dashboard', icon: 'fa-tachometer-alt', label: 'Dashboard' },
       { divider: true },
       { id: 'siswa-bimbingan', icon: 'fa-users', label: 'Siswa Bimbingan' },
-      { id: 'absensi-walas', icon: 'fa-chart-line', label: 'Rekap Absensi' },
       { id: 'kirim-laporan', icon: 'fa-exclamation-triangle', label: 'Kirim Laporan Kasus' },
       { id: 'riwayat-laporan', icon: 'fa-list', label: 'Riwayat Laporan' },
       { id: 'profil-walas', icon: 'fa-id-card', label: 'Profil Saya' },
@@ -40,7 +39,6 @@ export default function Sidebar({ user, activePanel, setActivePanel }) {
     petugas: [
       { id: 'dashboard', icon: 'fa-tachometer-alt', label: 'Dashboard' },
       { divider: true },
-      { id: 'absensi', icon: 'fa-check-circle', label: 'Absensi Hari Ini' },
       { id: 'laporan-petugas', icon: 'fa-inbox', label: 'Laporan Kasus dari Walas' },
       { id: 'siswa-view', icon: 'fa-users', label: 'Lihat Database Siswa' },
     ],

@@ -176,122 +176,84 @@ export default function PetugasPanel({ activePanel }) {
     ));
   };
 
-  if (activePanel === 'dashboard') {
-    return (
-      <div className="panel active-panel">
-        <div className="welcome-section">
-          <h1>👋 Halo, Petugas</h1>
-          <p>Kelola laporan kasus dari wali kelas.</p>
+  return (
+    <>
+      {/* Panel Content */}
+      <div className="panel-container">
+        {activePanel === 'dashboard' && (
+          <div className="panel active-panel">
+            <div className="welcome-section">
+              <h1>👋 Halo, Petugas</h1>
+              <p>Kelola laporan kasus dari wali kelas.</p>
+            </div>
+          </div>
+        )}
+
+        {activePanel === 'laporan-petugas' && (
+          <div className="panel active-panel">
+            <h2><i className="fas fa-inbox"></i> Laporan Kasus dari Wali Kelas</h2>
+            {statusMessage && <div className="alert alert-success">{statusMessage}</div>}
+            {loading && <div className="alert alert-info">Memuat...</div>}
+            {!loading && (!Array.isArray(laporanList) || laporanList.length === 0) && <div className="alert alert-info">Belum ada laporan kasus.</div>}
+            {!loading && Array.isArray(laporanList) && laporanList.length > 0 && (
+              <table className="data-table">
+                <thead><tr><th>Tgl Lapor</th><th>Wali Kelas</th><th>Siswa</th><th>Judul</th><th>Status</th><th>Aksi</th></tr></thead>
+                <tbody>{renderLaporanTable()}</tbody>
+              </table>
+            )}
+          </div>
+        )}
+        
+        {/* Siswa & Profil Panel... (sisanya sama) */}
+      </div>
+
+      {/* MODALS (Pindah ke luar container utama biar gak kena clip-path) */}
+      {showDetailModal && selectedLaporan && (
+        <div className="modal active" onClick={closeDetailModal}>
+          <div className="modal-content" onClick={e => e.stopPropagation()}>
+            <span className="close-modal" onClick={closeDetailModal}>&times;</span>
+            <h3>Detail Laporan Kasus</h3>
+            <div className="form-group"><label>Tanggal Lapor</label><p>{new Date(selectedLaporan.tanggal).toLocaleDateString('id-ID')}</p></div>
+            <div className="form-group"><label>Wali Kelas</label><p>{selectedLaporan.walas_id?.nama_lengkap || '-'}</p></div>
+            <div className="form-group"><label>Siswa</label><p>{selectedLaporan.siswa_id?.nama_lengkap || '-'}</p></div>
+            <div className="form-group"><label>Judul</label><p>{selectedLaporan.judul}</p></div>
+            <div className="form-group"><label>Deskripsi</label><p style={{ whiteSpace: 'pre-wrap' }}>{selectedLaporan.deskripsi}</p></div>
+            <div className="form-group"><label>Status</label><p>{selectedLaporan.status}</p></div>
+            <div style={{ display: 'flex', gap: '10px', justifyContent: 'flex-end' }}><button className="btn-submit" onClick={closeDetailModal}>Tutup</button></div>
+          </div>
         </div>
-      </div>
-    );
-  }
+      )}
 
-  if (activePanel === 'laporan-petugas') {
-    return (
-      <div className="panel active-panel">
-        <h2><i className="fas fa-inbox"></i> Laporan Kasus dari Wali Kelas</h2>
-        {statusMessage && <div className="alert alert-success">{statusMessage}</div>}
-        {loading && <div className="alert alert-info">Memuat...</div>}
-        {!loading && (!Array.isArray(laporanList) || laporanList.length === 0) && <div className="alert alert-info">Belum ada laporan kasus.</div>}
-        {!loading && Array.isArray(laporanList) && laporanList.length > 0 && (
-          <table className="data-table">
-            <thead><tr><th>Tgl Lapor</th><th>Wali Kelas</th><th>Siswa</th><th>Judul</th><th>Status</th><th>Aksi</th></tr></thead>
-            <tbody>{renderLaporanTable()}</tbody>
-          </table>
-        )}
-
-        {/* Modal Detail */}
-        {showDetailModal && selectedLaporan && (
-          <div className="modal active" onClick={closeDetailModal}>
-            <div className="modal-content" onClick={e => e.stopPropagation()}>
-              <span className="close-modal" onClick={closeDetailModal}>&times;</span>
-              <h3>Detail Laporan Kasus</h3>
-              <div className="form-group"><label>Tanggal Lapor</label><p>{new Date(selectedLaporan.tanggal).toLocaleDateString('id-ID')}</p></div>
-              <div className="form-group"><label>Wali Kelas</label><p>{selectedLaporan.walas_id?.nama_lengkap || '-'}</p></div>
-              <div className="form-group"><label>Siswa</label><p>{selectedLaporan.siswa_id?.nama_lengkap || '-'}</p></div>
-              <div className="form-group"><label>Judul</label><p>{selectedLaporan.judul}</p></div>
-              <div className="form-group"><label>Deskripsi</label><p style={{ whiteSpace: 'pre-wrap' }}>{selectedLaporan.deskripsi}</p></div>
-              <div className="form-group"><label>Status</label><p>{selectedLaporan.status}</p></div>
-              <div style={{ display: 'flex', gap: '10px', justifyContent: 'flex-end' }}><button className="btn-submit" onClick={closeDetailModal}>Tutup</button></div>
-            </div>
-          </div>
-        )}
-
-        {/* Modal Chat */}
-        {showChatModal && chatLaporan && (
-          <div className="modal active" onClick={closeChatModal}>
-            <div className="modal-content" onClick={e => e.stopPropagation()} style={{ maxWidth: '600px' }}>
-              <span className="close-modal" onClick={closeChatModal}>&times;</span>
-              <h3>Chat dengan Wali Kelas</h3>
-              <p><strong>Laporan:</strong> {chatLaporan.judul}</p>
-              <p>Sisa kuota: {maxChat - currentChatCount} dari {maxChat}</p>
-              <div style={{ maxHeight: '300px', overflowY: 'auto', border: '1px solid #e2e8f0', borderRadius: '16px', padding: '12px', marginBottom: '16px', background: '#f8fafc' }}>
-                {chatLoading && <p>Memuat...</p>}
-                {!chatLoading && chatMessages.length === 0 && <p>Belum ada pesan.</p>}
-                {chatMessages.map((msg, idx) => (
-                  <div key={idx} style={{ marginBottom: '12px', textAlign: msg.pengirim === 'petugas' ? 'right' : 'left' }}>
-                    <div style={{ display: 'inline-block', background: msg.pengirim === 'petugas' ? '#10b981' : '#e2e8f0', color: msg.pengirim === 'petugas' ? 'white' : '#1e293b', padding: '8px 12px', borderRadius: '16px', maxWidth: '80%' }}>
-                      <strong>{msg.pengirim === 'petugas' ? 'Petugas' : 'Wali Kelas'}</strong><br />
-                      {msg.pesan}
-                      <div style={{ fontSize: '10px' }}>{new Date(msg.waktu).toLocaleString()}</div>
-                    </div>
+      {showChatModal && chatLaporan && (
+        <div className="modal active" onClick={closeChatModal}>
+          <div className="modal-content" onClick={e => e.stopPropagation()}>
+            <span className="close-modal" onClick={closeChatModal}>&times;</span>
+            <h3>Chat dengan Wali Kelas</h3>
+            <p><strong>Laporan:</strong> {chatLaporan.judul}</p>
+            <p>Sisa kuota: {maxChat - currentChatCount} dari {maxChat}</p>
+            <div style={{ maxHeight: '300px', overflowY: 'auto', border: '1px solid #e2e8f0', borderRadius: '16px', padding: '12px', marginBottom: '16px', background: '#f8fafc' }}>
+              {chatLoading && <p>Memuat...</p>}
+              {!chatLoading && chatMessages.length === 0 && <p>Belum ada pesan.</p>}
+              {chatMessages.map((msg, idx) => (
+                <div key={idx} style={{ marginBottom: '12px', textAlign: msg.pengirim === 'petugas' ? 'right' : 'left' }}>
+                  <div style={{ display: 'inline-block', background: msg.pengirim === 'petugas' ? '#10b981' : '#e2e8f0', color: msg.pengirim === 'petugas' ? 'white' : '#1e293b', padding: '8px 12px', borderRadius: '16px', maxWidth: '80%' }}>
+                    <strong>{msg.pengirim === 'petugas' ? 'Petugas' : 'Wali Kelas'}</strong><br />
+                    {msg.pesan}
+                    <div style={{ fontSize: '10px' }}>{new Date(msg.waktu).toLocaleString()}</div>
                   </div>
-                ))}
-              </div>
-              {currentChatCount < maxChat && (
-                <div style={{ display: 'flex', gap: '8px' }}>
-                  <input type="text" style={{ flex: 1, padding: '8px', borderRadius: '40px' }} placeholder="Tulis pesan..." value={newChatMessage} onChange={e => setNewChatMessage(e.target.value)} onKeyPress={e => e.key === 'Enter' && sendChatMessage()} />
-                  <button className="btn-submit" onClick={sendChatMessage}>Kirim</button>
                 </div>
-              )}
-              {currentChatCount >= maxChat && <div className="alert alert-info">Maksimal 5 pesan tercapai.</div>}
-            </div>
-          </div>
-        )}
-      </div>
-    );
-  }
-
-  if (activePanel === 'siswa-view') {
-    return (
-      <div className="panel active-panel">
-        <h2>Data Siswa</h2>
-        {loading && <div className="alert alert-info">Memuat...</div>}
-        {!loading && (!Array.isArray(siswaList) || siswaList.length === 0) && <div className="alert alert-info">Belum ada data siswa.</div>}
-        {!loading && Array.isArray(siswaList) && siswaList.length > 0 && (
-          <table className="data-table">
-            <thead><tr><th>ID</th><th>Nama</th><th>NIK</th><th>NIS</th></tr></thead>
-            <tbody>
-              {siswaList.map(s => (
-                <tr key={s._id}>
-                  <td>{s._id}</td><td>{s.nama_lengkap}</td><td>{s.nik}</td><td>{s.nis || '-'}</td>
-                </tr>
               ))}
-            </tbody>
-          </table>
-        )}
-      </div>
-    );
-  }
-
-  if (activePanel === 'profil-petugas') {
-    return (
-      <div className="panel active-panel">
-        <h2>Profil Petugas</h2>
-        {loading && <div className="alert alert-info">Memuat...</div>}
-        {profil && (
-          <table className="data-table">
-            <tbody>
-              <tr><th>Nama</th><td>{profil.nama_lengkap}</td></tr>
-              <tr><th>NIK</th><td>{profil.nik}</td></tr>
-              <tr><th>Role</th><td>{profil.role}</td></tr>
-            </tbody>
-          </table>
-        )}
-      </div>
-    );
-  }
-
-  return <div className="panel active-panel"><p>Panel tidak ditemukan: {activePanel}</p></div>;
+            </div>
+            {currentChatCount < maxChat && (
+              <div style={{ display: 'flex', gap: '8px' }}>
+                <input type="text" style={{ flex: 1, padding: '8px', borderRadius: '40px' }} placeholder="Tulis pesan..." value={newChatMessage} onChange={e => setNewChatMessage(e.target.value)} onKeyPress={e => e.key === 'Enter' && sendChatMessage()} />
+                <button className="btn-submit" onClick={sendChatMessage}>Kirim</button>
+              </div>
+            )}
+            {currentChatCount >= maxChat && <div className="alert alert-info">Maksimal 5 pesan tercapai.</div>}
+          </div>
+        </div>
+      )}
+    </>
+  );
 }

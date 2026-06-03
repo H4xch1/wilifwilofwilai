@@ -5,17 +5,13 @@ import User from '../models/User.js';
 
 const router = express.Router();
 
-// GET /api/users/:role (admin only)
-router.get('/:role', verifyToken, checkRole('admin'), async (req, res) => {
-  try {
-    const users = await User.find({ role: req.params.role }).populate('wali_kelas_id', 'nama_lengkap');
-    res.json(users);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-});
+// ============================================================
+// PENTING: Route spesifik HARUS di atas route dinamis /:param
+// Kalau /:role di atas, Express akan tangkap /murid /profile/me
+// /list/walas sebagai `:role` dan langsung kena checkRole('admin')
+// ============================================================
 
-// GET /api/users/profile/me (self profile)
+// GET /api/users/profile/me
 router.get('/profile/me', verifyToken, async (req, res) => {
   try {
     const user = await User.findById(req.user.userId).populate('wali_kelas_id', 'nama_lengkap');
@@ -25,7 +21,37 @@ router.get('/profile/me', verifyToken, async (req, res) => {
   }
 });
 
-// PUT /api/users/:id (admin only) - UPDATE user
+// GET /api/users/murid (admin, petugas, walas)
+router.get('/murid', verifyToken, checkRole('admin', 'petugas', 'walas'), async (req, res) => {
+  try {
+    const murid = await User.find({ role: 'murid' });
+    res.json(murid);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+// GET /api/users/list/walas
+router.get('/list/walas', verifyToken, async (req, res) => {
+  try {
+    const walas = await User.find({ role: 'walas' }, 'nama_lengkap');
+    res.json(walas);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+// GET /api/users/:role (admin only) — HARUS PALING BAWAH
+router.get('/:role', verifyToken, checkRole('admin'), async (req, res) => {
+  try {
+    const users = await User.find({ role: req.params.role }).populate('wali_kelas_id', 'nama_lengkap');
+    res.json(users);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+// PUT /api/users/:id (admin only)
 router.put('/:id', verifyToken, checkRole('admin'), async (req, res) => {
   try {
     const { nama, nik, nis, tanggal_lahir, role, wali_kelas_id, password } = req.body;
@@ -38,7 +64,6 @@ router.put('/:id', verifyToken, checkRole('admin'), async (req, res) => {
       wali_kelas_id: wali_kelas_id || null
     };
 
-    // Jika password diisi, hash password baru
     if (password && password.trim() !== '') {
       const salt = await bcrypt.genSalt(10);
       updateData.password = await bcrypt.hash(password, salt);
@@ -57,16 +82,6 @@ router.delete('/:id', verifyToken, checkRole('admin'), async (req, res) => {
   try {
     await User.findByIdAndDelete(req.params.id);
     res.json({ message: 'User berhasil dihapus' });
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-});
-
-// GET /api/users/list/walas (untuk dropdown wali kelas)
-router.get('/list/walas', verifyToken, async (req, res) => {
-  try {
-    const walas = await User.find({ role: 'walas' }, 'nama_lengkap');
-    res.json(walas);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
