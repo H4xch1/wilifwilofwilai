@@ -1,0 +1,94 @@
+@import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Barlow:wght@400;500;600;700;800&display=swap');
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --zzz-bg:        #0a0c10;
+  --zzz-surface:   #111520;
+  --zzz-card:      #161b27;
+  --zzz-border:    #1e2840;
+  --zzz-yellow:    #f5c518;
+  --zzz-orange:    #ff6b1a;
+  --zzz-accent:    #ffd93d;
+  --zzz-cyan:      #00e5ff;
+  --zzz-red:       #ff3b52;
+  --zzz-green:     #00e5a0;
+  --zzz-text:      #e8eaf0;
+  --zzz-muted:     #6b7280;
+  --zzz-glow-y:    rgba(245, 197, 24, 0.35);
+  --zzz-glow-o:    rgba(255, 107, 26, 0.35);
+  --zzz-glow-c:    rgba(0, 229, 255, 0.2);
+}
+
+body {
+  font-family: 'Barlow', 'Segoe UI', sans-serif;
+  background: var(--zzz-bg);
+  color: var(--zzz-text);
+  overflow-x: hidden;
+}
+
+/* ZZZ-style diagonal stripe pattern bg */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image:
+    repeating-linear-gradient(
+      -55deg,
+      transparent,
+      transparent 60px,
+      rgba(245, 197, 24, 0.018) 60px,
+      rgba(245, 197, 24, 0.018) 62px
+    );
+  pointer-events: none;
+  z-index: 0;
+}
+
+::-webkit-scrollbar { width: 5px; }
+::-webkit-scrollbar-track { background: var(--zzz-bg); }
+::-webkit-scrollbar-thumb { background: var(--zzz-yellow); border-radius: 2px; }
+::-webkit-scrollbar-thumb:hover { background: var(--zzz-orange); }
+
+@keyframes slideIn {
+  from { transform: translateX(100%); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+@keyframes slideOut {
+  from { transform: translateX(0); opacity: 1; }
+  to { transform: translateX(100%); opacity: 0; }
+}
+@keyframes zzz-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 var(--zzz-glow-y); }
+  50%       { box-shadow: 0 0 18px 4px var(--zzz-glow-y); }
+}
+@keyframes zzz-scan {
+  0%   { transform: translateY(-100%); opacity: 0; }
+  10%  { opacity: 0.4; }
+  90%  { opacity: 0.4; }
+  100% { transform: translateY(100vh); opacity: 0; }
+}
+
+.toast-container {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 9999;
+}
+.toast-notification {
+  padding: 12px 20px;
+  border-radius: 4px;
+  margin-bottom: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+  animation: slideIn 0.3s ease;
+  cursor: pointer;
+  border-left: 4px solid var(--zzz-yellow);
+  background: var(--zzz-card);
+  color: var(--zzz-text);
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  font-size: 12px;
+}
+.toast-notification.success { border-left-color: var(--zzz-green); color: var(--zzz-green); }
+.toast-notification.error   { border-left-color: var(--zzz-red);   color: var(--zzz-red); }

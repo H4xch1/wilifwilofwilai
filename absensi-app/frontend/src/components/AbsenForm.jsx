@@ -1,0 +1,1 @@
+export default function AbsenForm() { return null; }

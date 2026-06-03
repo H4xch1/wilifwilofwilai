@@ -1,2 +1,58 @@
-# wilifwilofwilai
-ketika dunia menjadi meledak maka nah itulah batunya
+# AbsenCerdas - Sistem Absensi Digital
+
+## Struktur Project
+```
+ABSENSI-APP/
+├── backend/     # Node.js + Express + MongoDB
+└── frontend/    # React + Vite
+```
+
+## Setup
+
+### 1. Install MongoDB
+Pastikan MongoDB sudah running di localhost:27017
+```bash
+# Ubuntu
+sudo systemctl start mongod
+
+# Mac
+brew services start mongodb-community
+
+# Windows: jalankan MongoDB Compass atau mongod.exe
+```
+
+### 2. Backend
+```bash
+cd backend
+npm install
+
+# Seed database dengan data awal (termasuk Udin)
+npm run seed
+
+# Jalankan server
+npm run dev        # port 5000
+```
+
+### 3. Frontend
+```bash
+cd frontend
+npm install
+npm run dev        # port 3000
+```
+
+## 🔑 Login Credentials (Default)
+
+| Role | Nama | NIK | Password |
+|------|------|-----|----------|
+| Admin | Admin Utama | `111111111` | `123456` |
+| Wali Kelas | Pak Budi | `222222222` | `123456` |
+| Petugas | Bu Siti | `333333333` | `123456` |
+| Murid | **Udin** | `123123123` | `123456` |
+| Murid | Asep | `444444444` | `123456` |
+
+## Features
+- Multi-role: Admin, Petugas, Wali Kelas, Murid
+- Absensi dengan foto kamera
+- Upload bukti file
+- Laporan kasus antar role
+- Statistik & grafik kehadiran
