@@ -7,7 +7,9 @@ const userSchema = new mongoose.Schema({
   tanggal_lahir: { type: Date, default: null },
   password: { type: String, required: true },
   role: { type: String, enum: ['murid', 'petugas', 'walas', 'admin'], required: true },
-  wali_kelas_id: { type: mongoose.Schema.Types.ObjectId, ref: 'User', default: null }
+  wali_kelas_id: { type: mongoose.Schema.Types.ObjectId, ref: 'User', default: null },
+  kelas: { type: String, default: null },
+  kelas_wali: { type: String, default: null }
 }, { timestamps: true });
 
 export default mongoose.model('User', userSchema);

@@ -54,13 +54,15 @@ router.get('/:role', verifyToken, checkRole('admin'), async (req, res) => {
 // PUT /api/users/:id (admin only)
 router.put('/:id', verifyToken, checkRole('admin'), async (req, res) => {
   try {
-    const { nama, nik, nis, tanggal_lahir, role, wali_kelas_id, password } = req.body;
+    const { nama, nik, nis, tanggal_lahir, role, kelas, kelas_wali, wali_kelas_id, password } = req.body;
     const updateData = {
       nama_lengkap: nama,
       nik,
       nis,
       tanggal_lahir,
       role,
+      kelas,
+      kelas_wali,
       wali_kelas_id: wali_kelas_id || null
     };
 

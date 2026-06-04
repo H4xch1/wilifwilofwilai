@@ -24,6 +24,9 @@ export default function AdminPanel({ activePanel }) {
   const chartInstance = useRef(null);
   const messageTimeout = useRef(null);
 
+  // Daftar kelas (bisa diambil dari API nanti)
+  const kelasList = ['X-A', 'X-B', 'XI-A', 'XI-B', 'XII-A', 'XII-B'];
+
   useEffect(() => {
     setMessage('');
   }, [activePanel]);
@@ -125,7 +128,9 @@ export default function AdminPanel({ activePanel }) {
       tanggal_lahir: formData.get('tanggal_lahir') || null,
       password: formData.get('password'),
       role: role,
-      wali_kelas_id: formData.get('wali_kelas_id') || null
+      wali_kelas_id: formData.get('wali_kelas_id') || null,
+      kelas: formData.get('kelas') || null,
+      kelas_wali: formData.get('kelas_wali') || null
     };
     try {
       const res = await api.post('/auth/register', data);
@@ -159,13 +164,16 @@ export default function AdminPanel({ activePanel }) {
       nik: formData.get('nik_edit'),
       nis: formData.get('nis_edit') || null,
       tanggal_lahir: formData.get('tanggal_lahir_edit') || null,
+      kelas: formData.get('kelas_edit') || null,
     };
     const password = formData.get('password_edit');
     if (password && password.trim() !== '') data.password = password;
 
-    // Hanya jika mengedit siswa (manage-siswa), kirim wali_kelas_id
     if (activePanel === 'manage-siswa') {
       data.wali_kelas_id = formData.get('wali_kelas_id_edit') || null;
+    }
+    if (activePanel === 'manage-walas') {
+      data.kelas_wali = formData.get('kelas_wali_edit') || null;
     }
 
     try {
@@ -189,7 +197,13 @@ export default function AdminPanel({ activePanel }) {
         {safeUsers.length > 0 ? (
           <table className="data-table">
             <thead>
-              <tr><th>ID</th><th>Nama</th><th>NIK</th>{role === 'murid' && <th>NIS</th>}<th>Tgl Lahir</th></tr>
+              <tr>
+                <th>ID</th><th>Nama</th><th>NIK</th>
+                {role === 'murid' && <th>NIS</th>}
+                {role === 'murid' && <th>Kelas</th>}
+                {role === 'walas' && <th>Kelas Bimbingan</th>}
+                <th>Tgl Lahir</th>
+              </tr>
             </thead>
             <tbody>
               {safeUsers.map(u => (
@@ -198,6 +212,8 @@ export default function AdminPanel({ activePanel }) {
                   <td>{u.nama_lengkap}</td>
                   <td>{u.nik}</td>
                   {role === 'murid' && <td>{u.nis || '-'}</td>}
+                  {role === 'murid' && <td>{u.kelas || '-'}</td>}
+                  {role === 'walas' && <td>{u.kelas_wali || '-'}</td>}
                   <td>{u.tanggal_lahir ? new Date(u.tanggal_lahir).toLocaleDateString('id-ID') : '-'}</td>
                 </tr>
               ))}
@@ -217,7 +233,13 @@ export default function AdminPanel({ activePanel }) {
         {safeUsers.length > 0 ? (
           <table className="data-table">
             <thead>
-              <tr><th>ID</th><th>Nama</th><th>NIK</th><th>Aksi</th></tr>
+              <tr>
+                <th>ID</th><th>Nama</th><th>NIK</th>
+                {role === 'murid' && <th>Kelas</th>}
+                {role === 'murid' && <th>Wali Kelas</th>}
+                {role === 'walas' && <th>Kelas Bimbingan</th>}
+                <th>Aksi</th>
+              </tr>
             </thead>
             <tbody>
               {safeUsers.map(u => (
@@ -225,6 +247,9 @@ export default function AdminPanel({ activePanel }) {
                   <td>{u._id}</td>
                   <td>{u.nama_lengkap}</td>
                   <td>{u.nik}</td>
+                  {role === 'murid' && <td>{u.kelas || '-'}</td>}
+                  {role === 'murid' && <td>{u.wali_kelas_id?.nama_lengkap || '-'}</td>}
+                  {role === 'walas' && <td>{u.kelas_wali || '-'}</td>}
                   <td>
                     <button className="btn-edit-small" onClick={() => openEdit(u)}>Edit</button>
                     <button className="btn-delete" onClick={() => handleDelete(u._id, role)}>Hapus</button>
@@ -248,6 +273,13 @@ export default function AdminPanel({ activePanel }) {
         {role === 'murid' && (
           <>
             <div className="form-group"><label>NIS</label><input type="text" name="nis" /></div>
+            <div className="form-group">
+              <label>Kelas</label>
+              <select name="kelas">
+                <option value="">-- Pilih Kelas --</option>
+                {kelasList.map(k => <option key={k} value={k}>{k}</option>)}
+              </select>
+            </div>
             <div className="form-group"><label>Tanggal Lahir</label><input type="date" name="tanggal_lahir" /></div>
             <div className="form-group">
               <label>Wali Kelas</label>
@@ -257,6 +289,15 @@ export default function AdminPanel({ activePanel }) {
               </select>
             </div>
           </>
+        )}
+        {role === 'walas' && (
+          <div className="form-group">
+            <label>Kelas Bimbingan</label>
+            <select name="kelas_wali">
+              <option value="">-- Pilih Kelas Bimbingan --</option>
+              {kelasList.map(k => <option key={k} value={k}>{k}</option>)}
+            </select>
+          </div>
         )}
         <div className="form-group"><label>Password</label><input type="password" name="password" required /></div>
         <button type="submit" className="btn-submit">Daftar</button>
@@ -316,19 +357,34 @@ export default function AdminPanel({ activePanel }) {
               <div className="form-group"><label>NIS</label><input type="text" name="nis_edit" defaultValue={editData.nis || ''} /></div>
               <div className="form-group"><label>Tgl Lahir</label><input type="date" name="tanggal_lahir_edit" defaultValue={editData.tanggal_lahir ? editData.tanggal_lahir.split('T')[0] : ''} /></div>
               
-              {/* Role tidak ditampilkan karena tidak boleh diubah dari manage per role */}
-              
-              {/* Hanya tampilkan wali kelas jika activePanel === 'manage-siswa' */}
               {activePanel === 'manage-siswa' && (
+                <>
+                  <div className="form-group">
+                    <label>Kelas</label>
+                    <select name="kelas_edit" defaultValue={editData.kelas || ''}>
+                      <option value="">-- Pilih Kelas --</option>
+                      {kelasList.map(k => <option key={k} value={k}>{k}</option>)}
+                    </select>
+                  </div>
+                  <div className="form-group">
+                    <label>Wali Kelas</label>
+                    <select name="wali_kelas_id_edit" defaultValue={editData.wali_kelas_id || ''}>
+                      <option value="">-- Tidak punya --</option>
+                      {walasList.map(w => <option key={w._id} value={w._id}>{w.nama_lengkap}</option>)}
+                    </select>
+                  </div>
+                </>
+              )}
+              {activePanel === 'manage-walas' && (
                 <div className="form-group">
-                  <label>Wali Kelas</label>
-                  <select name="wali_kelas_id_edit" defaultValue={editData.wali_kelas_id || ''}>
-                    <option value="">-- Tidak punya --</option>
-                    {walasList.map(w => <option key={w._id} value={w._id}>{w.nama_lengkap}</option>)}
+                  <label>Kelas Bimbingan</label>
+                  <select name="kelas_wali_edit" defaultValue={editData.kelas_wali || ''}>
+                    <option value="">-- Pilih Kelas --</option>
+                    {kelasList.map(k => <option key={k} value={k}>{k}</option>)}
                   </select>
                 </div>
               )}
-              
+
               <div className="form-group"><label>Password (kosongkan jika tidak diubah)</label><input type="password" name="password_edit" /></div>
               <button type="submit" className="btn-submit">Simpan</button>
             </form>
