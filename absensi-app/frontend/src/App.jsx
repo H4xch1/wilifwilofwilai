@@ -102,6 +102,8 @@ const LandingPage = ({ user }) => {
                     <img src="/images/logo/logo2.png" alt="Logo 2" style={{ height: '60px', objectFit: 'contain' }} />
                     <img src="/images/logo/logo3.png" alt="Logo 3" style={{ height: '60px', objectFit: 'contain' }} />
                     <img src="/images/logo/logo4.png" alt="Logo 4" style={{ height: '60px', objectFit: 'contain' }} />
+                    <img src="/images/logo/logo5.png" alt="Logo 4" style={{ height: '60px', objectFit: 'contain' }} />
+                    <img src="/images/logo/logo6.png" alt="Logo 6" style={{ height: '60px', objectFit: 'contain' }} />
                 </div>
             </div>
         </div>
