@@ -74,7 +74,7 @@ export default function WalasPanel({ activePanel }) {
     } catch (err) {
       console.error('Gagal ambil profil, pakai localStorage fallback', err);
       const user = JSON.parse(localStorage.getItem('user')) || {};
-      setProfil({ nama_lengkap: user.nama || 'Wali Kelas', nik: user.nik || '-', role: 'walas' });
+      setProfil({ nama_lengkap: user.nama || 'Walas', nik: user.nik || '-', role: 'walas' });
     }
     setLoading(false);
   };

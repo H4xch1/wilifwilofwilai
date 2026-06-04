@@ -79,7 +79,7 @@ const seedDB = async () => {
       murid.wali_kelas_id = walas._id;
       await murid.save();
     }
-    console.log(`Assigned ${murids.length} murid to wali kelas: ${walas.nama_lengkap}`);
+    console.log(`Assigned ${murids.length} murid to walas: ${walas.nama_lengkap}`);
 
     // Create sample absensi for Udin
     const udin = users.find(u => u.nama_lengkap === 'Udin');

@@ -24,8 +24,7 @@ export default function AdminPanel({ activePanel }) {
   const chartInstance = useRef(null);
   const messageTimeout = useRef(null);
 
-  // Daftar kelas (bisa diambil dari API nanti)
-  const kelasList = ['X-A', 'X-B', 'XI-A', 'XI-B', 'XII-A', 'XII-B'];
+  const kelasList = ['X PPLG 1', 'X PPLG 2', 'XI PPLG 1', 'XI PPLG 2', 'XII PPLG 1', 'XII PPLG 2', 'X DKV 1', 'X DKV 2', 'XI DKV 1', 'XI DKV 2', 'XII DKV 1', 'XII DKV 2', 'X PEMASARAN 1', 'X PEMASARAN 2', 'XI PEMASARAN 1', 'XI PEMASARAN 2', 'XII PEMASARAN 1', 'XII PEMASARAN 2', 'X MPLB 1', 'X MPLB 2', 'XI MPLB 1', 'XI MPLB 2', 'XII MPLB 1', 'XII MPLB 2' ];
 
   useEffect(() => {
     setMessage('');
@@ -86,6 +85,10 @@ export default function AdminPanel({ activePanel }) {
       if (role) fetchUsers(role);
     }
     if (activePanel.includes('register')) fetchWalas();
+    // Untuk manage siswa, kita juga butuh daftar wali kelas agar bisa menampilkan nama (bukan ID)
+    if (activePanel === 'manage-siswa') {
+      fetchWalas();
+    }
   }, [activePanel]);
 
   useEffect(() => {
@@ -226,6 +229,12 @@ export default function AdminPanel({ activePanel }) {
 
   const renderManagePanel = (title, role) => {
     const safeUsers = Array.isArray(users) ? users : [];
+    // Fungsi untuk mendapatkan nama wali kelas dari ID
+    const getWaliName = (waliId) => {
+      if (!waliId) return '-';
+      const wali = walasList.find(w => w._id === waliId);
+      return wali ? wali.nama_lengkap : waliId; // jika tidak ditemukan, tampilkan ID
+    };
     return (
       <div className="panel active-panel">
         <h2>{title}</h2>
@@ -248,7 +257,9 @@ export default function AdminPanel({ activePanel }) {
                   <td>{u.nama_lengkap}</td>
                   <td>{u.nik}</td>
                   {role === 'murid' && <td>{u.kelas || '-'}</td>}
-                  {role === 'murid' && <td>{u.wali_kelas_id?.nama_lengkap || '-'}</td>}
+                  {role === 'murid' && (
+                    <td>{getWaliName(u.wali_kelas_id)}</td>
+                  )}
                   {role === 'walas' && <td>{u.kelas_wali || '-'}</td>}
                   <td>
                     <button className="btn-edit-small" onClick={() => openEdit(u)}>Edit</button>
