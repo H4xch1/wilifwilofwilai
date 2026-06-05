@@ -38,7 +38,7 @@ const LandingPage = ({ user }) => {
                 {/* Navbar */}
                 <div style={{ position: 'absolute', top: 0, width: '100%', padding: '25px 40px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     <div style={{ fontSize: '1.6rem', fontWeight: '800', color: '#38ef7d', display: 'flex', alignItems: 'center', gap: '10px' }}>
-                        <i className="fas fa-leaf"></i> AbsenHijau
+                        <img src="/images/logo-navbar.png" alt="Logo 6" style={{ height: '60px', objectFit: 'contain' }} /> Absensi
                     </div>
                 </div>
 
