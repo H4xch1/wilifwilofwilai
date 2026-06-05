@@ -37,5 +37,6 @@ app.get('/api/data', (req, res) => {
 const dirs = ['uploads/absensi', 'uploads/absensi/kamera'];
 dirs.forEach(dir => { if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true }); });
 
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`Server jalan di port https://localhost:${PORT}/`));
+/* const PORT = process.env.PORT || 5000;
+app.listen(PORT, () => console.log(`Server jalan di port https://localhost:${PORT}/`)); */
+export default app;
