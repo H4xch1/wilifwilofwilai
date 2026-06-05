@@ -29,4 +29,3 @@ export default defineConfig({
     }
   }
 })
-const response = await fetch(`${import.meta.env.VITE_API_URL}/your-endpoint`);
