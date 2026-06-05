@@ -1,4 +1,4 @@
-import mongoose from 'mongoose';
+/*import mongoose from 'mongoose';
 import bcrypt from 'bcryptjs';
 import dotenv from 'dotenv';
 import User from './models/User.js';
@@ -20,7 +20,6 @@ const seedDB = async () => {
 
     const hashedPassword = await bcrypt.hash('123456', 10);
 
-    // Create users
     const users = await User.create([
       {
         nama_lengkap: 'Admin Utama',
@@ -106,7 +105,6 @@ const seedDB = async () => {
     ]);
     console.log('Sample absensi created for Udin');
 
-    // Create sample laporan kasus
     const asep = users.find(u => u.nama_lengkap === 'Asep');
     await LaporanKasus.create({
       walas_id: walas._id,
@@ -133,4 +131,4 @@ const seedDB = async () => {
   }
 };
 
-seedDB();
+seedDB(); */

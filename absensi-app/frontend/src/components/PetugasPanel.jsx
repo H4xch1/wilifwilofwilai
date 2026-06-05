@@ -178,7 +178,6 @@ export default function PetugasPanel({ activePanel }) {
 
   return (
     <>
-      {/* Panel Content */}
       <div className="panel-container">
         {activePanel === 'dashboard' && (
           <div className="panel active-panel">
@@ -204,10 +203,8 @@ export default function PetugasPanel({ activePanel }) {
           </div>
         )}
         
-        {/* Siswa & Profil Panel... (sisanya sama) */}
       </div>
 
-      {/* MODALS (Pindah ke luar container utama biar gak kena clip-path) */}
       {showDetailModal && selectedLaporan && (
         <div className="modal active" onClick={closeDetailModal}>
           <div className="modal-content" onClick={e => e.stopPropagation()}>

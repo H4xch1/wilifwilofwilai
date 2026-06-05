@@ -16,7 +16,12 @@ connectDB();
 const app = express();
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
-app.use(cors());
+app.use(cors({
+    origin: 'https://umamusume.app', 
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],     
+    credentials: true
+}));
+
 app.use(express.json({ limit: '10mb' }));
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
@@ -24,6 +29,10 @@ app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/absensi', absensiRoutes);
 app.use('/api/laporan', laporanRoutes);
+
+app.get('/api/data', (req, res) => {
+  res.json({ message: "You're in!" });
+});
 
 const dirs = ['uploads/absensi', 'uploads/absensi/kamera'];
 dirs.forEach(dir => { if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true }); });

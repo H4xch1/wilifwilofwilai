@@ -29,7 +29,6 @@ export default function MuridPanel({ activePanel }) {
   const [loading, setLoading] = useState(false);
   const [selectedAbsen, setSelectedAbsen] = useState(null);
 
-  // Cek absen hari ini
   const checkSudahAbsen = async () => {
     try {
       const res = await api.get('/absensi/riwayat');
@@ -166,7 +165,6 @@ export default function MuridPanel({ activePanel }) {
     };
   }, [activePanel]);
 
-  // ========== RENDER ==========
   if (activePanel === 'dashboard') {
     const user = JSON.parse(localStorage.getItem('user')) || {};
     return (
@@ -261,7 +259,6 @@ export default function MuridPanel({ activePanel }) {
           </>
         )}
 
-        {/* Modal Detail */}
         {selectedAbsen && (
           <div className="modal-overlay" onClick={closeDetail}>
             <div className="modal-detail" onClick={(e) => e.stopPropagation()}>
@@ -291,7 +288,6 @@ export default function MuridPanel({ activePanel }) {
                 <div>
                   <strong>File Bukti:</strong>
                   <div style={{ marginTop: '10px' }}>
-                    {/* Auto Preview Logic */}
                     {/\.(jpg|jpeg|png|gif|webp)$/i.test(selectedAbsen.file_path) ? (
                       <div style={{ marginBottom: '10px' }}>
                         <img 

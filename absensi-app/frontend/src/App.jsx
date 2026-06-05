@@ -12,10 +12,8 @@ const LandingPage = ({ user }) => {
             color: '#334155',
             minHeight: '100vh'
         }}>
-            {/* HERO SECTION */}
             <div style={{
                 minHeight: '85vh',
-                // Gunakan gambar lokal (simpan di public/images/bg-school.jpg)
                 backgroundImage: `linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url("/images/bg-school.jpg")`,
                 backgroundSize: 'cover',
                 backgroundPosition: 'center',
@@ -29,13 +27,11 @@ const LandingPage = ({ user }) => {
                 padding: '0 20px',
                 position: 'relative'
             }}>
-                {/* Fallback jika gambar tidak ada: tampilkan gradient */}
                 <style>{`
                     .hero-fallback {
                         background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
                     }
                 `}</style>
-                {/* Navbar */}
                 <div style={{ position: 'absolute', top: 0, width: '100%', padding: '25px 40px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     <div style={{ fontSize: '1.6rem', fontWeight: '800', color: '#38ef7d', display: 'flex', alignItems: 'center', gap: '10px' }}>
                         <img src="/images/logo-navbar.png" alt="Logo 6" style={{ height: '60px', objectFit: 'contain' }} /> Absensi
@@ -66,7 +62,6 @@ const LandingPage = ({ user }) => {
                 </Link>
             </div>
 
-            {/* FEATURES SECTION - tidak berubah */}
             <div style={{ padding: '80px 40px', maxWidth: '1200px', margin: '0 auto', textAlign: 'center' }}>
                 <h2 style={{ fontSize: '2.5rem', fontWeight: '800', color: '#11998e', marginBottom: '50px', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '15px' }}>
                     <i className="fas fa-star" style={{ color: '#f59e0b' }}></i> Fitur Utama
@@ -95,7 +90,6 @@ const LandingPage = ({ user }) => {
                 </div>
             </div>
 
-            {/* LOGOS SECTION */}
             <div style={{ background: '#fcfeff', padding: '60px 40px', borderTop: '1px solid #e2e8f0' }}>
                 <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', alignItems: 'center', gap: '40px', maxWidth: '1000px', margin: '0 auto' }}>
                     <img src="/images/logo/logo1.png" alt="Logo 1" style={{ height: '60px', objectFit: 'contain' }} />

@@ -38,7 +38,6 @@ export default function Dashboard({ user, setUser }) {
     'manage-walas': 'Manage Walas',
     'register-admin': 'Register Admin',
     'manage-admin': 'Manage Admin',
-    // untuk role lain (walas, petugas, murid) silakan tambahkan sendiri
   };
 
   return (

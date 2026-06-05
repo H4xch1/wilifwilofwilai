@@ -518,7 +518,6 @@
 .status-sakit { background: rgba(245, 197, 24, 0.12); color: var(--zzz-yellow); border: 1px solid rgba(245,197,24,0.3); }
 .status-izin  { background: rgba(0, 229, 255, 0.12); color: var(--zzz-cyan);  border: 1px solid rgba(0,229,255,0.3); }
 
-/* ---------- ALERTS ---------- */
 .alert {
   padding: 12px 16px;
   border-radius: 3px;
@@ -532,7 +531,6 @@
 .alert-error   { background: rgba(255,59,82,0.1);  color: var(--zzz-red);   border-left-color: var(--zzz-red); }
 .alert-info    { background: rgba(0,229,255,0.1);  color: var(--zzz-cyan);  border-left-color: var(--zzz-cyan); }
 
-/* ---------- MODAL ---------- */
 .modal {
   display: none;
   position: fixed;
@@ -571,7 +569,6 @@
 }
 .close-modal:hover { color: var(--zzz-yellow); }
 
-/* ---------- RESPONSIVE ---------- */
 @media (max-width: 768px) {
   .sidebar { transform: translateX(-100%); width: 0; }
   .sidebar.sidebar-open { transform: translateX(0); width: 270px; }

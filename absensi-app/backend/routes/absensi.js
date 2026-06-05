@@ -8,13 +8,11 @@ import User from '../models/User.js';
 
 const router = express.Router();
 
-// Pastikan folder uploads ada
 const uploadDir = 'uploads/absensi/';
 const kameraDir = 'uploads/absensi/kamera/';
 if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir, { recursive: true });
 if (!fs.existsSync(kameraDir)) fs.mkdirSync(kameraDir, { recursive: true });
 
-// Konfigurasi multer untuk menerima dua field file: bukti_file dan foto_kamera
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     if (file.fieldname === 'foto_kamera') {
@@ -31,7 +29,6 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ storage, limits: { fileSize: 5 * 1024 * 1024 } });
 
-// POST /api/absensi - Menerima file bukti_file dan/atau foto_kamera
 router.post('/', verifyToken, checkRole('murid'), upload.fields([
   { name: 'bukti_file', maxCount: 1 },
   { name: 'foto_kamera', maxCount: 1 }
@@ -41,7 +38,6 @@ router.post('/', verifyToken, checkRole('murid'), upload.fields([
     const tanggal = new Date().toISOString().split('T')[0];
     const userId = req.user.userId;
 
-    // Cek apakah sudah absen hari ini
     const existing = await Absensi.findOne({ user_id: userId, tanggal });
     if (existing) return res.status(400).json({ message: 'Anda sudah absen hari ini!' });
 
@@ -72,7 +68,6 @@ router.post('/', verifyToken, checkRole('murid'), upload.fields([
   }
 });
 
-// GET /api/absensi/riwayat
 router.get('/riwayat', verifyToken, checkRole('murid'), async (req, res) => {
   try {
     const riwayat = await Absensi.find({ user_id: req.user.userId }).sort({ tanggal: -1 });
@@ -82,7 +77,6 @@ router.get('/riwayat', verifyToken, checkRole('murid'), async (req, res) => {
   }
 });
 
-// GET /api/absensi/walas/:siswaId
 router.get('/walas/:siswaId', verifyToken, checkRole('walas'), async (req, res) => {
   try {
     const siswa = await User.findOne({ _id: req.params.siswaId, wali_kelas_id: req.user.userId });
@@ -95,7 +89,6 @@ router.get('/walas/:siswaId', verifyToken, checkRole('walas'), async (req, res) 
   }
 });
 
-// GET /api/absensi/statistik/bulan-ini
 router.get('/statistik/bulan-ini', verifyToken, checkRole('admin'), async (req, res) => {
   try {
     const bulanIni = new Date().toISOString().slice(0, 7);

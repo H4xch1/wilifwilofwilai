@@ -24,7 +24,9 @@ export default defineConfig({
       '/uploads': {
         target: 'http://localhost:5000',
         changeOrigin: true
+        
       }
     }
   }
 })
+const response = await fetch(`${import.meta.env.VITE_API_URL}/your-endpoint`);

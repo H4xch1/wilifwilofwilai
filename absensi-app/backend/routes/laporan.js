@@ -7,7 +7,6 @@ const router = express.Router();
 
 router.post('/', verifyToken, checkRole('walas'), async (req, res) => {
   try {
-    // Pastikan kita ambil ID yang bener dari token
     const walasId = req.user.id || req.user._id || req.user.userId;
 
     if (!walasId) {
@@ -17,7 +16,7 @@ router.post('/', verifyToken, checkRole('walas'), async (req, res) => {
     const { siswa_id, judul, deskripsi } = req.body;
     console.log(req.user)
     const laporan = new LaporanKasus({
-      walas_id: walasId, // Pake variabel yang udah kita amanin
+      walas_id: walasId, 
       siswa_id, 
       judul, 
       deskripsi,

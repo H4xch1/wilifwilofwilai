@@ -27,7 +27,6 @@ body {
   overflow-x: hidden;
 }
 
-/* ZZZ-style diagonal stripe pattern bg */
 body::before {
   content: '';
   position: fixed;

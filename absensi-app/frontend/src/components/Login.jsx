@@ -18,7 +18,7 @@ export default function Login({ setUser }) {
     setLoading(true);
     setError('');
     try {
-      const res = await axios.post(`http://localhost:5000/api/auth/login`, { nik, password });
+      const res = await axios.post(`${import.meta.env.VITE_API_URL}/auth/login`, { nik, password });
       localStorage.setItem('token', res.data.token);
       localStorage.setItem('user', JSON.stringify(res.data.user));
       setUser(res.data.user);
@@ -38,7 +38,6 @@ export default function Login({ setUser }) {
 
   return (
     <div style={{ position: 'relative', minHeight: '100vh', overflow: 'hidden' }}>
-      {/* Video Background dengan suara (awal mute) */}
       <video
         ref={videoRef}
         autoPlay
@@ -63,7 +62,6 @@ export default function Login({ setUser }) {
         Browser Anda tidak mendukung video tag.
       </video>
 
-      {/* Overlay gelap agar teks terbaca */}
       <div style={{
         position: 'absolute',
         top: 0,
@@ -74,7 +72,6 @@ export default function Login({ setUser }) {
         zIndex: 1
       }}></div>
 
-      {/* Tombol kontrol suara video */}
       <button
         onClick={toggleVideoSound}
         style={{
@@ -103,7 +100,6 @@ export default function Login({ setUser }) {
         <i className={isVideoMuted ? 'fas fa-volume-mute' : 'fas fa-volume-up'}></i>
       </button>
 
-      {/* Konten Form Login */}
       <div style={{
         position: 'relative',
         zIndex: 2,
@@ -124,7 +120,6 @@ export default function Login({ setUser }) {
           backdropFilter: 'blur(12px)',
           WebkitBackdropFilter: 'blur(12px)'
         }}>
-          {/* Sisi Kiri - Welcome */}
           <div style={{
             flex: 1,
             background: 'linear-gradient(145deg, rgba(0, 0, 0, 0.5) 0%, rgba(15, 23, 42, 0.3) 100%)',
@@ -141,7 +136,6 @@ export default function Login({ setUser }) {
             <p style={{ color: '#cbd5e1' }}>Masuk ke dashboard<br />Sistem Absensi Cerdas</p>
           </div>
 
-          {/* Sisi Kanan - Form */}
           <div style={{ flex: 1, padding: '3rem' }}>
             <h1 style={{
               fontSize: '2rem',

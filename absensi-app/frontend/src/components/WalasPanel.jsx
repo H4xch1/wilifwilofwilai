@@ -27,19 +27,6 @@ export default function WalasPanel({ activePanel }) {
   const [profil, setProfil] = useState(null);
   const [loading, setLoading] = useState(false);
 
-  // Mock data hanya untuk fallback
-  const mockSiswa = [
-    { _id: '1', nama_lengkap: 'Budi Santoso', nis: '12345' },
-    { _id: '2', nama_lengkap: 'Siti Aminah', nis: '12346' }
-  ];
-  const mockAbsensi = [
-    { tanggal: '2026-05-30', status: 'hadir', foto_kamera: null },
-    { tanggal: '2026-05-29', status: 'sakit', foto_kamera: null }
-  ];
-  const mockRiwayat = [
-    { _id: '1', tanggal: '2026-05-28', siswa_id: { nama_lengkap: 'Budi Santoso' }, judul: 'Bolos', deskripsi: 'Tidak masuk 3 hari', status: 'belum_dibaca' }
-  ];
-
   const fetchSiswaBimbingan = async () => {
     setLoading(true);
     try {

@@ -85,7 +85,6 @@ export default function AdminPanel({ activePanel }) {
       if (role) fetchUsers(role);
     }
     if (activePanel.includes('register')) fetchWalas();
-    // Untuk manage siswa, kita juga butuh daftar wali kelas agar bisa menampilkan nama (bukan ID)
     if (activePanel === 'manage-siswa') {
       fetchWalas();
     }
@@ -229,11 +228,10 @@ export default function AdminPanel({ activePanel }) {
 
   const renderManagePanel = (title, role) => {
     const safeUsers = Array.isArray(users) ? users : [];
-    // Fungsi untuk mendapatkan nama wali kelas dari ID
     const getWaliName = (waliId) => {
       if (!waliId) return '-';
       const wali = walasList.find(w => w._id === waliId);
-      return wali ? wali.nama_lengkap : waliId; // jika tidak ditemukan, tampilkan ID
+      return wali ? wali.nama_lengkap : waliId; 
     };
     return (
       <div className="panel active-panel">

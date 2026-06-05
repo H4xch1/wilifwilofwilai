@@ -13,7 +13,6 @@ export default function Sidebar({ user, activePanel, setActivePanel }) {
     admin: [
       { id: 'dashboard', icon: 'fa-tachometer-alt', label: 'Dashboard' },
       { divider: true },
-      { id: 'account', icon: 'fa-user-circle', label: 'Account' },
       { id: 'siswa-view', icon: 'fa-users', label: 'Lihat Siswa' },
       { id: 'petugas-view', icon: 'fa-chalkboard', label: 'Lihat Petugas' },
       { id: 'walas-view', icon: 'fa-chalkboard-user', label: 'Lihat Walas' },
