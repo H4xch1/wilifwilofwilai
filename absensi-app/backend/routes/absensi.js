@@ -1,34 +1,38 @@
 import express from 'express';
 import multer from 'multer';
-import path from 'path';
-import fs from 'fs';
+import { v2 as cloudinary } from 'cloudinary';
+import { CloudinaryStorage } from 'multer-storage-cloudinary';
 import { verifyToken, checkRole } from '../middleware/auth.js';
 import Absensi from '../models/Absensi.js';
 import User from '../models/User.js';
 
 const router = express.Router();
 
-const uploadDir = 'uploads/absensi/';
-const kameraDir = 'uploads/absensi/kamera/';
-if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir, { recursive: true });
-if (!fs.existsSync(kameraDir)) fs.mkdirSync(kameraDir, { recursive: true });
-
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    if (file.fieldname === 'foto_kamera') {
-      cb(null, kameraDir);
-    } else {
-      cb(null, uploadDir);
-    }
-  },
-  filename: (req, file, cb) => {
-    const ext = path.extname(file.originalname);
-    const prefix = file.fieldname === 'foto_kamera' ? 'kamera_' : 'file_';
-    cb(null, `${prefix}${Date.now()}_${req.user.userId}${ext}`);
-  }
+// 1. Konfigurasi Cloudinary (Otomatis narik dari Environment Variables Vercel Web lu)
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
 });
+
+// 2. Setup Cloudinary Storage (Bypass local storage biar gak kena Error 500 Read-Only)
+const storage = new CloudinaryStorage({
+  cloudinary: cloudinary,
+  params: async (req, file) => {
+    // Memisahkan folder upload bukti surat/file vs foto kamera di Cloudinary
+    const folderName = file.fieldname === 'foto_kamera' ? 'absensi/kamera' : 'absensi/bukti_file';
+    return {
+      folder: folderName,
+      allowed_formats: ['jpg', 'png', 'jpeg', 'pdf'], 
+      public_id: `${file.fieldname}_${Date.now()}_${req.user.userId}`,
+    };
+  },
+});
+
+// 3. Inisialisasi Multer bawaan Cloudinary Storage
 const upload = multer({ storage, limits: { fileSize: 5 * 1024 * 1024 } });
 
+// --- ROUTE UTAMA: SUBMIT ABSENSI ---
 router.post('/', verifyToken, checkRole('murid'), upload.fields([
   { name: 'bukti_file', maxCount: 1 },
   { name: 'foto_kamera', maxCount: 1 }
@@ -44,10 +48,11 @@ router.post('/', verifyToken, checkRole('murid'), upload.fields([
     let filePath = null;
     let fotoKameraPath = null;
 
-    if (req.files['bukti_file']) {
+    // Ambil secure URL upload-an online langsung dari payload req.files
+    if (req.files && req.files['bukti_file']) {
       filePath = req.files['bukti_file'][0].path;
     }
-    if (req.files['foto_kamera']) {
+    if (req.files && req.files['foto_kamera']) {
       fotoKameraPath = req.files['foto_kamera'][0].path;
     }
 
@@ -55,7 +60,7 @@ router.post('/', verifyToken, checkRole('murid'), upload.fields([
       user_id: userId,
       tanggal,
       status,
-      file_path: filePath,
+      file_path: filePath, 
       foto_kamera: fotoKameraPath,
       keterangan: keterangan || ''
     });
@@ -68,6 +73,7 @@ router.post('/', verifyToken, checkRole('murid'), upload.fields([
   }
 });
 
+// --- ROUTE GET RIWAYAT MURID ---
 router.get('/riwayat', verifyToken, checkRole('murid'), async (req, res) => {
   try {
     const riwayat = await Absensi.find({ user_id: req.user.userId }).sort({ tanggal: -1 });
@@ -77,6 +83,7 @@ router.get('/riwayat', verifyToken, checkRole('murid'), async (req, res) => {
   }
 });
 
+// --- ROUTE GET SISWA BIMBINGAN (WALAS) ---
 router.get('/walas/:siswaId', verifyToken, checkRole('walas'), async (req, res) => {
   try {
     const siswa = await User.findOne({ _id: req.params.siswaId, wali_kelas_id: req.user.userId });
@@ -89,6 +96,7 @@ router.get('/walas/:siswaId', verifyToken, checkRole('walas'), async (req, res) 
   }
 });
 
+// --- ROUTE STATISTIK BULANAN (ADMIN) ---
 router.get('/statistik/bulan-ini', verifyToken, checkRole('admin'), async (req, res) => {
   try {
     const bulanIni = new Date().toISOString().slice(0, 7);
