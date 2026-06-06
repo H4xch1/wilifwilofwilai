@@ -14,15 +14,12 @@ api.interceptors.request.use((config) => {
 });
 
 export default function PetugasPanel({ activePanel }) {
-  // State
   const [laporanList, setLaporanList] = useState([]);
   const [siswaList, setSiswaList] = useState([]);
   const [absensiList, setAbsensiList] = useState([]);
   const [profil, setProfil] = useState(null);
   const [statusMessage, setStatusMessage] = useState('');
   const [loading, setLoading] = useState(false);
-  
-  // Modals & Chat
   const [showDetailModal, setShowDetailModal] = useState(false);
   const [selectedLaporan, setSelectedLaporan] = useState(null);
   const [showChatModal, setShowChatModal] = useState(false);
@@ -40,7 +37,7 @@ export default function PetugasPanel({ activePanel }) {
     messageTimeout = setTimeout(() => setStatusMessage(''), 3000);
   };
 
-  // Fetchers
+  // --- FETCH FUNCTIONS ---
   const fetchLaporan = async () => {
     setLoading(true);
     try {
@@ -72,16 +69,27 @@ export default function PetugasPanel({ activePanel }) {
     try {
       const res = await api.get('/users/profile/me');
       setProfil(res.data || {});
-    } catch (err) { setProfil(null); }
+    } catch (err) {
+      const user = JSON.parse(localStorage.getItem('user')) || {};
+      setProfil({ nama_lengkap: user.nama || 'Petugas', nik: user.nik || '-', role: 'petugas' });
+    }
   };
 
-  // Actions
+  // --- EFFECTS ---
+  useEffect(() => {
+    if (activePanel === 'laporan-petugas') fetchLaporan();
+    if (activePanel === 'siswa-view') fetchSiswa();
+    if (activePanel === 'absensi-hari-ini') fetchAbsensiHariIni();
+    if (activePanel === 'profil-petugas') fetchProfil();
+  }, [activePanel]);
+
+  // --- HANDLERS ---
   const updateStatus = async (id, status) => {
     try {
       await api.put(`/laporan/${id}/status`, { status });
       showMessage('Status diperbarui');
       fetchLaporan();
-    } catch (err) { showMessage('Gagal update'); }
+    } catch (err) { showMessage('Gagal update status'); }
   };
 
   const openChatModal = async (laporan) => {
@@ -92,7 +100,7 @@ export default function PetugasPanel({ activePanel }) {
       const res = await api.get(`/laporan/${laporan._id}/chat`);
       setChatMessages(res.data?.chats || []);
       setMaxChat(res.data?.maxChat ?? 5);
-      setCurrentChatCount(res.data?.currentCount ?? 0);
+      setCurrentChatCount(res.data?.currentCount ?? (res.data?.chats?.length || 0));
     } catch (err) { setChatMessages([]); }
     setChatLoading(false);
   };
@@ -104,79 +112,80 @@ export default function PetugasPanel({ activePanel }) {
       setChatMessages(res.data?.chats || []);
       setCurrentChatCount(res.data?.chats?.length || 0);
       setNewChatMessage('');
-      showMessage('Pesan terkirim');
     } catch (err) { showMessage('Gagal kirim'); }
   };
 
-  useEffect(() => {
-    if (activePanel === 'laporan-petugas') fetchLaporan();
-    if (activePanel === 'siswa-view') fetchSiswa();
-    if (activePanel === 'absensi-hari-ini') fetchAbsensiHariIni();
-    if (activePanel === 'profil-petugas') fetchProfil();
-  }, [activePanel]);
-
   return (
-    <>
-      <div className="panel-container">
-        {activePanel === 'laporan-petugas' && (
-          <div className="panel active-panel">
-            <h2>Laporan Kasus</h2>
-            {statusMessage && <div className="alert">{statusMessage}</div>}
-            <table className="data-table">
-              <thead><tr><th>Siswa</th><th>Judul</th><th>Status</th><th>Aksi</th></tr></thead>
-              <tbody>
-                {laporanList.map(lap => (
-                  <tr key={lap._id}>
-                    <td>{lap.siswa_id?.nama_lengkap}</td>
-                    <td>{lap.judul}</td>
-                    <td>{lap.status}</td>
-                    <td>
-                      <button onClick={() => updateStatus(lap._id, 'dibaca')}>Baca</button>
-                      <button onClick={() => openChatModal(lap)}>💬 Chat</button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
+    <div className="panel-container">
+      {/* 1. DASHBOARD */}
+      {activePanel === 'dashboard' && (
+        <div className="panel active-panel"><h1>👋 Halo, Petugas</h1></div>
+      )}
 
-        {activePanel === 'siswa-view' && (
-          <div className="panel active-panel">
-            <h2>Data Siswa</h2>
-            <table className="data-table">
-              <thead><tr><th>Nama</th><th>NIS</th><th>Kelas</th></tr></thead>
-              <tbody>{siswaList.map(s => <tr key={s._id}><td>{s.nama_lengkap}</td><td>{s.nis}</td><td>{s.kelas}</td></tr>)}</tbody>
-            </table>
-          </div>
-        )}
+      {/* 2. LAPORAN KASUS */}
+      {activePanel === 'laporan-petugas' && (
+        <div className="panel active-panel">
+          <h2>Laporan Kasus</h2>
+          {statusMessage && <div className="alert">{statusMessage}</div>}
+          <table className="data-table">
+            <thead><tr><th>Wali Kelas</th><th>Siswa</th><th>Judul</th><th>Status</th><th>Aksi</th></tr></thead>
+            <tbody>
+              {laporanList.map(lap => (
+                <tr key={lap._id}>
+                  <td>{lap.walas_id?.nama_lengkap}</td>
+                  <td>{lap.siswa_id?.nama_lengkap}</td>
+                  <td>{lap.judul}</td>
+                  <td>{lap.status}</td>
+                  <td>
+                    <button onClick={() => updateStatus(lap._id, 'dibaca')}>Baca</button>
+                    <button onClick={() => openChatModal(lap)}>💬 Chat</button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
 
-        {activePanel === 'absensi-hari-ini' && (
-          <div className="panel active-panel">
-            <h2>Absensi Hari Ini</h2>
-            <table className="data-table">
-              <thead><tr><th>Nama</th><th>Status</th><th>Waktu</th></tr></thead>
-              <tbody>{absensiList.map(a => <tr key={a._id}><td>{a.siswa_id?.nama_lengkap}</td><td>{a.status}</td><td>{new Date(a.tanggal).toLocaleTimeString()}</td></tr>)}</tbody>
-            </table>
-          </div>
-        )}
-      </div>
+      {/* 3. DATA SISWA */}
+      {activePanel === 'siswa-view' && (
+        <div className="panel active-panel">
+          <h2>Data Siswa</h2>
+          <table className="data-table">
+            <thead><tr><th>Nama</th><th>NIS</th><th>Kelas</th></tr></thead>
+            <tbody>
+              {siswaList.map(s => <tr key={s._id}><td>{s.nama_lengkap}</td><td>{s.nis}</td><td>{s.kelas}</td></tr>)}
+            </tbody>
+          </table>
+        </div>
+      )}
 
-      {/* Chat Modal */}
-      {showChatModal && chatLaporan && (
+      {/* 4. ABSENSI HARI INI */}
+      {activePanel === 'absensi-hari-ini' && (
+        <div className="panel active-panel">
+          <h2>Absensi Hari Ini</h2>
+          <table className="data-table">
+            <thead><tr><th>Nama</th><th>Status</th><th>Waktu</th></tr></thead>
+            <tbody>
+              {absensiList.map(a => <tr key={a._id}><td>{a.siswa_id?.nama_lengkap}</td><td>{a.status}</td><td>{new Date(a.tanggal).toLocaleTimeString()}</td></tr>)}
+            </tbody>
+          </table>
+        </div>
+      )}
+
+      {/* MODAL CHAT */}
+      {showChatModal && (
         <div className="modal active" onClick={() => setShowChatModal(false)}>
           <div className="modal-content" onClick={e => e.stopPropagation()}>
-            <h3>Chat: {chatLaporan.judul}</h3>
-            <div style={{ maxHeight: '300px', overflowY: 'auto', border: '1px solid #ccc', padding: '10px' }}>
-              {chatMessages.map((m, i) => <div key={i}>{m.pengirim}: {m.pesan}</div>)}
+            <h3>Chat Laporan</h3>
+            <div style={{ maxHeight: '200px', overflowY: 'auto' }}>
+              {chatMessages.map((msg, i) => <div key={i}>{msg.pesan}</div>)}
             </div>
-            <div style={{ marginTop: '10px' }}>
-              <input value={newChatMessage} onChange={e => setNewChatMessage(e.target.value)} placeholder="Pesan..." />
-              <button onClick={sendChatMessage}>Kirim</button>
-            </div>
+            <input value={newChatMessage} onChange={e => setNewChatMessage(e.target.value)} />
+            <button onClick={sendChatMessage}>Kirim</button>
           </div>
         </div>
       )}
-    </>
+    </div>
   );
 }
