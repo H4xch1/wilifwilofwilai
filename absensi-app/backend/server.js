@@ -15,40 +15,40 @@ dotenv.config();
 const app = express();
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
-// 1. PASANG CORS DI PALING ATAS HARGA MATI!
+// 1. CORS Dinamis (Bypass semua domain .vercel.app)
 app.use(cors({
-    origin: ['https://wilifwilof.vercel.app', 'http://localhost:5173'], // Masukin domain frontend Vercel lu & localhost biar aman
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'], // Tambahin OPTIONS di sini bray     
+    origin: (origin, callback) => {
+        // Izinkan kalau request dari vercel.app, localhost, atau kalau origin kosong (server-to-server)
+        if (!origin || origin.endsWith('.vercel.app') || origin.includes('localhost')) {
+            callback(null, true);
+        } else {
+            callback(new Error('Not allowed by CORS'));
+        }
+    },
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     credentials: true,
     allowedHeaders: ['Content-Type', 'Authorization']
 }));
 
-// 2. TRICK JITU: Bypass langsung kalau browser cuman ngecek ombak (Preflight OPTIONS)
+// 2. Bypass OPTIONS
 app.options('*', cors());
 
 app.use(express.json({ limit: '10mb' }));
 
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
-// 3. MIDDLEWARE DATABASE DIBAWAH CORS & OPTIONS!
-// Biar request cek ombak gak ketahan sama loading database
+// 3. Database Middleware
 app.use(async (req, res, next) => {
-  // Kalau browser cuman kirim preflight OPTIONS, langsung lolosin tanpa cek DB
-  if (req.method === 'OPTIONS') {
-    return next();
-  }
+  if (req.method === 'OPTIONS') return next();
   
   try {
     await connectDB();
     next();
   } catch (err) {
-    // Pastiin kalau DB error, tetep kasih header CORS biar kelihatan di inspect element frontend
-    res.header("Access-Control-Allow-Origin", "https://wilifwilof.vercel.vercel.app");
-    res.status(500).json({ error: "Database connection failed bray" });
+    res.status(500).json({ error: "Database connection failed" });
   }
 });
 
-// Route-route API lu
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/absensi', absensiRoutes);
