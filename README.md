@@ -25,10 +25,7 @@ brew services start mongodb-community
 cd backend
 npm install
 
-# Seed database dengan data awal (termasuk Udin)
-npm run seed
-
-# Jalankan server
+# Jalankan server kalau mau local
 npm run dev        # port 5000
 ```
 
