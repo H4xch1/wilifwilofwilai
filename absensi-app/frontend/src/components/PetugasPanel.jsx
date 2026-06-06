@@ -116,11 +116,16 @@ export default function PetugasPanel({ activePanel }) {
   };
 
   return (
-    <div className="panel-container">
-      {/* 1. DASHBOARD */}
-      {activePanel === 'dashboard' && (
-        <div className="panel active-panel"><h1>👋 Halo, Petugas</h1></div>
-      )}
+    <>
+      <div className="panel-container">
+        {activePanel === 'dashboard' && (
+          <div className="panel active-panel">
+            <div className="welcome-section">
+              <h1>👋 Halo, Petugas</h1>
+              <p>Kelola laporan kasus dari wali kelas.</p>
+            </div>
+          </div>
+        )}
 
       {/* 2. LAPORAN KASUS */}
       {activePanel === 'laporan-petugas' && (
@@ -187,5 +192,6 @@ export default function PetugasPanel({ activePanel }) {
         </div>
       )}
     </div>
+  </>
   );
 }
