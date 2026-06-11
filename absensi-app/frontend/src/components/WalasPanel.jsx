@@ -28,6 +28,7 @@ export default function WalasPanel({ activePanel }) {
   const [showAbsensi, setShowAbsensi] = useState(false);
   const [profil, setProfil] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [selectedSiswa, setSelectedSiswa] = useState(null); // modal detail siswa
 
   const exportToExcel = () => {
     if (absensiSiswa.length === 0) {
@@ -143,6 +144,7 @@ export default function WalasPanel({ activePanel }) {
     }
     setShowAbsensi(false);
     setViewingSiswa(null);
+    setSelectedSiswa(null);
   }, [activePanel]);
 
   if (activePanel === 'dashboard') {
@@ -166,40 +168,37 @@ export default function WalasPanel({ activePanel }) {
   }
 
   if (activePanel === 'siswa-bimbingan') {
-    if (showAbsensi && viewingSiswa) {
+    if (showAbsensi) {
       return (
         <div className="panel active-panel">
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <h2>Absensi: {viewingSiswa.nama_lengkap}</h2>
-            <div>
-              <button onClick={() => setShowAbsensi(false)}>Kembali</button>
-              <button onClick={exportToExcel} style={{ marginLeft: '10px' }}>Export Excel</button>
-            </div>
-          </div>
-
-          <table className="data-table">
-            <thead>
-              <tr>
-                <th>Tanggal</th>
-                <th>Status</th>
-                <th>Keterangan</th>
-              </tr>
-            </thead>
-            <tbody>
-              {absensiSiswa.map((a, i) => (
-                <tr key={i}>
-                  <td>{a.tanggal}</td>
-                  <td>{a.status}</td>
-                  <td>{a.keterangan || '-'}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+          <h2>Rekap Absensi</h2>
+          <div className="alert alert-info">Siswa: {viewingSiswa?.nama_lengkap}</div>
+          {loading && <div className="alert alert-info">Memuat...</div>}
+          {!loading && absensiSiswa.length === 0 && <div className="alert alert-info">Belum ada data absensi.</div>}
+          {!loading && absensiSiswa.length > 0 && (
+            <table className="data-table">
+              <thead>
+                <tr><th>Tanggal</th><th>Status</th><th>Foto</th></tr>
+              </thead>
+              <tbody>
+                {absensiSiswa.map((a, i) => (
+                  <tr key={i}>
+                    <td>{a.tanggal}</td>
+                    <td><span className={`status-badge status-${a.status}`}>{a.status}</span></td>
+                    <td>{a.foto_kamera ? <a href={`${API_URL.replace('/api', '')}/${a.foto_kamera}`} target="_blank" rel="noopener noreferrer">Lihat</a> : '-'}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
+          <button className="btn-submit" style={{ marginTop: '15px' }} onClick={handleBackToSiswa}>
+            ← Kembali ke Siswa Bimbingan
+          </button>
         </div>
       );
     }
 
-    // TAMPILAN DAFTAR SISWA BIMBINGAN (diperbaiki kontrasnya)
+    // TAMPILAN DAFTAR SISWA BIMBINGAN
     return (
       <div className="panel active-panel">
         <h2>Siswa Bimbingan</h2>
@@ -209,34 +208,121 @@ export default function WalasPanel({ activePanel }) {
           siswaList.map(siswa => (
             <div
               key={siswa._id}
-              // === Pindahin onclick ke sini, biar satu blok jadi tombol ===
-              onClick={() => handleLihatAbsensi(siswa._id)}
+              onClick={() => setSelectedSiswa(siswa)}
               style={{
                 background: '#1e293b',
                 padding: '12px 16px',
                 borderRadius: '8px',
                 marginBottom: '12px',
                 borderLeft: '3px solid #f5c518',
-                cursor: 'pointer', // Biar cursor berubah jadi tangan pas di-hover
-                transition: 'background 0.2s' // Opsional: biar ada efek dikit pas di-hover
+                cursor: 'pointer',
+                transition: 'background 0.2s',
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center'
               }}
-              // Tambahin hover effect biar user tau itu bisa diklik
-              onMouseOver={(e) => e.currentTarget.style.background = '#2d3748'}
-              onMouseOut={(e) => e.currentTarget.style.background = '#1e293b'}
+              onMouseOver={e => e.currentTarget.style.background = '#2d3748'}
+              onMouseOut={e => e.currentTarget.style.background = '#1e293b'}
             >
-              <strong style={{ color: '#f5c518', fontSize: '15px' }}>
-                {siswa.nama_lengkap}
-              </strong>
-              <span style={{ color: '#94a3b8', fontSize: '13px', marginLeft: '8px' }}>
-                (NIS: {siswa.nis || '-'})
+              <div>
+                <strong style={{ color: '#f5c518', fontSize: '15px' }}>{siswa.nama_lengkap}</strong>
+                <span style={{ color: '#94a3b8', fontSize: '13px', marginLeft: '8px' }}>
+                  (NIS: {siswa.nis || '-'})
+                </span>
+              </div>
+              <span style={{ color: '#64748b', fontSize: '12px' }}>
+                Detail <i className="fas fa-chevron-right"></i>
               </span>
-              {/* Tombol sudah pensiun ya, gak perlu lagi */}
             </div>
           ))
+        )}
+
+        {/* ===== MODAL DETAIL SISWA ===== */}
+        {selectedSiswa && (
+          <div
+            onClick={() => setSelectedSiswa(null)}
+            style={{
+              position: 'fixed', top: 0, left: 0, width: '100%', height: '100%',
+              background: 'rgba(0,0,0,0.75)', zIndex: 9999,
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              backdropFilter: 'blur(4px)', padding: '20px'
+            }}
+          >
+            <div
+              onClick={e => e.stopPropagation()}
+              style={{
+                background: '#1e293b', borderRadius: '10px', padding: '28px',
+                minWidth: '320px', maxWidth: '460px', width: '100%',
+                boxShadow: '0 20px 60px rgba(0,0,0,0.6)',
+                border: '1px solid #334155',
+                borderTop: '2px solid #f5c518'
+              }}
+            >
+              {/* Header */}
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+                <h3 style={{ margin: 0, color: '#f5c518', fontSize: '17px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <i className="fas fa-user-circle"></i> Detail Siswa
+                </h3>
+                <button
+                  onClick={() => setSelectedSiswa(null)}
+                  style={{ background: 'transparent', border: 'none', color: '#64748b', fontSize: '20px', cursor: 'pointer' }}
+                >
+                  <i className="fas fa-times"></i>
+                </button>
+              </div>
+
+              {/* Info */}
+              <table style={{ width: '100%', borderCollapse: 'collapse', marginBottom: '22px' }}>
+                <tbody>
+                  {[
+                    ['Nama Lengkap', selectedSiswa.nama_lengkap],
+                    ['NIS',          selectedSiswa.nis || '-'],
+                    ['NIK',          selectedSiswa.nik || '-'],
+                    ['Tanggal Lahir', selectedSiswa.tanggal_lahir
+                      ? new Date(selectedSiswa.tanggal_lahir).toLocaleDateString('id-ID')
+                      : '-'],
+                    ['Kelas',        selectedSiswa.kelas || '-'],
+                  ].map(([label, value]) => (
+                    <tr key={label} style={{ borderBottom: '1px solid #334155' }}>
+                      <td style={{ color: '#94a3b8', padding: '8px 4px', fontSize: '12px', width: '40%', textTransform: 'uppercase', letterSpacing: '0.05em' }}>{label}</td>
+                      <td style={{ color: '#e2e8f0', padding: '8px 4px', fontSize: '14px', fontWeight: '600' }}>{value}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+
+              {/* Tombol aksi */}
+              <div style={{ display: 'flex', gap: '10px' }}>
+                <button
+                  onClick={() => { setSelectedSiswa(null); handleLihatAbsensi(selectedSiswa._id); }}
+                  style={{
+                    flex: 1, background: 'linear-gradient(135deg, #11998e, #38ef7d)',
+                    color: '#0a0c10', border: 'none', padding: '11px 16px',
+                    borderRadius: '6px', cursor: 'pointer', fontWeight: '700',
+                    fontSize: '13px', letterSpacing: '0.05em', textTransform: 'uppercase'
+                  }}
+                >
+                  <i className="fas fa-calendar-check" style={{ marginRight: '6px' }}></i>
+                  Lihat Absensi
+                </button>
+                <button
+                  onClick={() => setSelectedSiswa(null)}
+                  style={{
+                    background: '#334155', color: '#94a3b8', border: 'none',
+                    padding: '11px 18px', borderRadius: '6px', cursor: 'pointer', fontSize: '13px'
+                  }}
+                >
+                  Tutup
+                </button>
+              </div>
+            </div>
+          </div>
         )}
       </div>
     );
   }
+
+
 
   if (activePanel === 'kirim-laporan') {
     return (
