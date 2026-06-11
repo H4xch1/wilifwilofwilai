@@ -207,31 +207,33 @@ const exportToExcel = () => {
         {!loading && siswaList.length === 0 && <div className="alert alert-info">Belum ada siswa bimbingan.</div>}
         {!loading && siswaList.length > 0 && (
           siswaList.map(siswa => (
-            <div
-              key={siswa._id}
-              style={{
-                background: '#1e293b',        // latar gelap kontras
-                padding: '12px 16px',
-                borderRadius: '8px',
-                marginBottom: '12px',
-                borderLeft: '3px solid #f5c518'
-              }}
-            >
-              <strong style={{ color: '#f5c518', fontSize: '15px' }}>{siswa.nama_lengkap}</strong>
-              <span style={{ color: '#94a3b8', fontSize: '13px', marginLeft: '8px' }}>
-                (NIS: {siswa.nis || '-'})
+          <div
+          key={siswa._id}
+      // === Pindahin onclick ke sini, biar satu blok jadi tombol ===
+      onClick={() => handleLihatAbsensi(siswa._id)}
+      style={{
+        background: '#1e293b',
+        padding: '12px 16px',
+        borderRadius: '8px',
+        marginBottom: '12px',
+        borderLeft: '3px solid #f5c518',
+        cursor: 'pointer', // Biar cursor berubah jadi tangan pas di-hover
+        transition: 'background 0.2s' // Opsional: biar ada efek dikit pas di-hover
+      }}
+      // Tambahin hover effect biar user tau itu bisa diklik
+      onMouseOver={(e) => e.currentTarget.style.background = '#2d3748'}
+      onMouseOut={(e) => e.currentTarget.style.background = '#1e293b'}
+    >
+      <strong style={{ color: '#f5c518', fontSize: '15px' }}>
+        {siswa.nama_lengkap}
+      </strong>
+      <span style={{ color: '#94a3b8', fontSize: '13px', marginLeft: '8px' }}>
+        (NIS: {siswa.nis || '-'})
               </span>
-              <br />
-              <button
-                className="btn-edit-small"
-                onClick={() => handleLihatAbsensi(siswa._id)}
-                style={{ marginTop: '8px' }}
-              >
-                Lihat Absensi
-              </button>
-            </div>
-          ))
-        )}
+            {/* Tombol sudah pensiun ya, gak perlu lagi */}
+      </div>
+      ))
+  )}
       </div>
     );
   }
