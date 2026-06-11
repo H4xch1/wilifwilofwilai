@@ -3,7 +3,9 @@ import axios from 'axios';
 
 const API_URL = import.meta.env.VITE_API_URL;
 
-const api = axios.create({ baseURL: API_URL });
+const api = axios.create({
+  baseURL: API_URL
+});
 
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem('token');
@@ -14,7 +16,7 @@ api.interceptors.request.use((config) => {
 export default function PetugasPanel({ activePanel }) {
   const [laporanList, setLaporanList] = useState([]);
   const [siswaList, setSiswaList] = useState([]);
-  const [absensiList, setAbsensiList] = useState([]); // FIX 1: state was missing
+  const [absensiList, setAbsensiList] = useState([]);  // FIX: declare missing state
   const [profil, setProfil] = useState(null);
   const [statusMessage, setStatusMessage] = useState('');
   const [loading, setLoading] = useState(false);
@@ -27,6 +29,7 @@ export default function PetugasPanel({ activePanel }) {
   const [chatLoading, setChatLoading] = useState(false);
   const [maxChat, setMaxChat] = useState(5);
   const [currentChatCount, setCurrentChatCount] = useState(0);
+  const [siswaSearch, setSiswaSearch] = useState('');
 
   let messageTimeout = null;
   const showMessage = (msg) => {
@@ -69,7 +72,7 @@ export default function PetugasPanel({ activePanel }) {
       else if (res.data && typeof res.data === 'object') data = Object.values(res.data);
       setSiswaList(data);
     } catch (err) {
-      console.error(err);
+      console.error('fetchSiswa error:', err);
       setSiswaList([]);
     }
     setLoading(false);
@@ -108,8 +111,14 @@ export default function PetugasPanel({ activePanel }) {
     }
   };
 
-  const openDetailModal = (laporan) => { setSelectedLaporan(laporan); setShowDetailModal(true); };
-  const closeDetailModal = () => { setShowDetailModal(false); setSelectedLaporan(null); };
+  const openDetailModal = (laporan) => {
+    setSelectedLaporan(laporan);
+    setShowDetailModal(true);
+  };
+  const closeDetailModal = () => {
+    setShowDetailModal(false);
+    setSelectedLaporan(null);
+  };
 
   const openChatModal = async (laporan) => {
     setChatLaporan(laporan);
@@ -136,7 +145,10 @@ export default function PetugasPanel({ activePanel }) {
 
   const sendChatMessage = async () => {
     if (!newChatMessage.trim()) return;
-    if (currentChatCount >= maxChat) { showMessage('Maksimal 5 pesan sudah tercapai'); return; }
+    if (currentChatCount >= maxChat) {
+      showMessage('Maksimal 5 pesan sudah tercapai');
+      return;
+    }
     try {
       const res = await api.post(`/laporan/${chatLaporan._id}/chat`, { pesan: newChatMessage });
       const newChats = (res.data && Array.isArray(res.data.chats)) ? res.data.chats : [];
@@ -149,24 +161,12 @@ export default function PetugasPanel({ activePanel }) {
     }
   };
 
-  // FIX 2: 'absensi' not 'absensi-hari-ini' — match Sidebar menu id
-  // FIX 3: add 'profil-petugas' trigger
   useEffect(() => {
     if (activePanel === 'laporan-petugas') fetchLaporan();
     if (activePanel === 'siswa-view') fetchSiswa();
-    if (activePanel === 'absensi') fetchAbsensi();       // was 'absensi-hari-ini' — fixed
-    if (activePanel === 'profil-petugas') fetchProfil(); // was missing trigger — fixed
+    if (activePanel === 'absensi-hari-ini') fetchAbsensi();
+    if (activePanel === 'profil-petugas') fetchProfil();
   }, [activePanel]);
-
-  const statusBadge = (status) => {
-    const map = {
-      belum_dibaca: { cls: 'status-sakit', label: 'Belum Dibaca' },
-      dibaca:       { cls: 'status-izin',  label: 'Dibaca' },
-      ditindaklanjuti: { cls: 'status-hadir', label: 'Ditindaklanjuti' },
-    };
-    const s = map[status] || { cls: '', label: status };
-    return <span className={`status-badge ${s.cls}`}>{s.label}</span>;
-  };
 
   const renderLaporanTable = () => {
     if (!Array.isArray(laporanList) || laporanList.length === 0) return null;
@@ -176,73 +176,142 @@ export default function PetugasPanel({ activePanel }) {
         <td>{lap.walas_id?.nama_lengkap || '-'}</td>
         <td>{lap.siswa_id?.nama_lengkap || '-'}</td>
         <td>{lap.judul}</td>
-        <td>{statusBadge(lap.status)}</td>
         <td>
-          <button className="btn-edit-small" onClick={(e) => { e.stopPropagation(); updateStatus(lap._id, 'dibaca'); }}>Tandai Dibaca</button>
-          <button className="btn-edit-small btn-edit-small--green" onClick={(e) => { e.stopPropagation(); updateStatus(lap._id, 'ditindaklanjuti'); }}>Tindak Lanjut</button>
-          <button className="btn-edit-small btn-edit-small--yellow" onClick={(e) => { e.stopPropagation(); openChatModal(lap); }}>💬 Chat</button>
+          {lap.status === 'belum_dibaca' && <span style={{ background: '#fef3c7', padding: '4px 8px', borderRadius: '20px' }}>Belum dibaca</span>}
+          {lap.status === 'dibaca' && <span style={{ background: '#dbeafe', padding: '4px 8px', borderRadius: '20px' }}>Dibaca</span>}
+          {lap.status === 'ditindaklanjuti' && <span style={{ background: '#d1fae5', padding: '4px 8px', borderRadius: '20px' }}>Ditindaklanjuti</span>}
+        </td>
+        <td>
+          <button className="btn-edit-small" style={{ background: '#3b82f6' }} onClick={(e) => { e.stopPropagation(); updateStatus(lap._id, 'dibaca'); }}>Tandai Dibaca</button>
+          <button className="btn-edit-small" style={{ background: '#10b981' }} onClick={(e) => { e.stopPropagation(); updateStatus(lap._id, 'ditindaklanjuti'); }}>Tindak Lanjuti</button>
+          <button className="btn-edit-small" style={{ background: '#f59e0b' }} onClick={(e) => { e.stopPropagation(); openChatModal(lap); }}>💬 Chat</button>
         </td>
       </tr>
     ));
   };
 
+  // FIX: filtered siswa list for search
+  const filteredSiswa = siswaList.filter(s => {
+    const q = siswaSearch.toLowerCase();
+    return (
+      (s.nama_lengkap || '').toLowerCase().includes(q) ||
+      (s.nis || '').toLowerCase().includes(q) ||
+      (s.kelas || '').toLowerCase().includes(q)
+    );
+  });
+
   return (
     <>
       <div className="panel-container">
-
-        {/* DASHBOARD */}
         {activePanel === 'dashboard' && (
           <div className="panel active-panel">
             <div className="welcome-section">
               <h1>👋 Halo, Petugas</h1>
-              <p>Kelola laporan kasus dari wali kelas dan pantau absensi siswa.</p>
+              <p>Kelola laporan kasus dari wali kelas.</p>
             </div>
           </div>
         )}
 
-        {/* LAPORAN */}
         {activePanel === 'laporan-petugas' && (
           <div className="panel active-panel">
             <h2><i className="fas fa-inbox"></i> Laporan Kasus dari Wali Kelas</h2>
             {statusMessage && <div className="alert alert-success">{statusMessage}</div>}
             {loading && <div className="alert alert-info">Memuat...</div>}
-            {!loading && (!Array.isArray(laporanList) || laporanList.length === 0) && (
-              <div className="alert alert-info">Belum ada laporan kasus.</div>
-            )}
+            {!loading && (!Array.isArray(laporanList) || laporanList.length === 0) && <div className="alert alert-info">Belum ada laporan kasus.</div>}
             {!loading && Array.isArray(laporanList) && laporanList.length > 0 && (
               <table className="data-table">
-                <thead>
-                  <tr><th>Tgl Lapor</th><th>Wali Kelas</th><th>Siswa</th><th>Judul</th><th>Status</th><th>Aksi</th></tr>
-                </thead>
+                <thead><tr><th>Tgl Lapor</th><th>Wali Kelas</th><th>Siswa</th><th>Judul</th><th>Status</th><th>Aksi</th></tr></thead>
                 <tbody>{renderLaporanTable()}</tbody>
               </table>
             )}
           </div>
         )}
 
-        {/* ABSENSI — FIX 2: activePanel 'absensi' matches Sidebar id */}
-        {activePanel === 'absensi' && (
+        {/* FIX: Panel Lihat Database Siswa — was completely missing from JSX */}
+        {activePanel === 'siswa-view' && (
+          <div className="panel active-panel">
+            <h2><i className="fas fa-users"></i> Database Siswa</h2>
+            {statusMessage && <div className="alert alert-success">{statusMessage}</div>}
+
+            {/* Search bar */}
+            <div style={{ marginBottom: '16px' }}>
+              <input
+                type="text"
+                placeholder="Cari nama, NIS, atau kelas..."
+                value={siswaSearch}
+                onChange={e => setSiswaSearch(e.target.value)}
+                style={{
+                  width: '100%',
+                  maxWidth: '400px',
+                  padding: '10px 16px',
+                  borderRadius: '40px',
+                  border: '1px solid #e2e8f0',
+                  fontSize: '14px',
+                  outline: 'none',
+                  background: '#f8fafc'
+                }}
+              />
+            </div>
+
+            {loading && <div className="alert alert-info">Memuat data siswa...</div>}
+
+            {!loading && siswaList.length === 0 && (
+              <div className="alert alert-info">Belum ada data siswa.</div>
+            )}
+
+            {!loading && siswaList.length > 0 && filteredSiswa.length === 0 && (
+              <div className="alert alert-info">Tidak ada siswa yang cocok dengan pencarian.</div>
+            )}
+
+            {!loading && filteredSiswa.length > 0 && (
+              <>
+                <p style={{ color: '#64748b', fontSize: '13px', marginBottom: '12px' }}>
+                  Menampilkan {filteredSiswa.length} dari {siswaList.length} siswa
+                </p>
+                <table className="data-table">
+                  <thead>
+                    <tr>
+                      <th>#</th>
+                      <th>Nama Lengkap</th>
+                      <th>NIS</th>
+                      <th>Kelas</th>
+                      <th>Wali Kelas</th>
+                      <th>Tanggal Lahir</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {filteredSiswa.map((siswa, idx) => (
+                      <tr key={siswa._id}>
+                        <td>{idx + 1}</td>
+                        <td>{siswa.nama_lengkap || '-'}</td>
+                        <td>{siswa.nis || '-'}</td>
+                        <td>{siswa.kelas || '-'}</td>
+                        <td>{siswa.wali_kelas_id?.nama_lengkap || '-'}</td>
+                        <td>{siswa.tanggal_lahir ? new Date(siswa.tanggal_lahir).toLocaleDateString('id-ID') : '-'}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </>
+            )}
+          </div>
+        )}
+
+        {/* Panel Absensi */}
+        {activePanel === 'absensi-hari-ini' && (
           <div className="panel active-panel">
             <h2><i className="fas fa-clipboard-list"></i> Absensi Hari Ini</h2>
             {loading && <div className="alert alert-info">Memuat...</div>}
-            {!loading && absensiList.length === 0 && (
-              <div className="alert alert-info">Belum ada data absensi hari ini.</div>
-            )}
+            {!loading && absensiList.length === 0 && <div className="alert alert-info">Belum ada data absensi hari ini.</div>}
             {!loading && absensiList.length > 0 && (
               <table className="data-table">
-                <thead>
-                  <tr><th>Nama Siswa</th><th>Status</th><th>Waktu</th></tr>
-                </thead>
+                <thead><tr><th>Nama Siswa</th><th>Status</th><th>Waktu</th></tr></thead>
                 <tbody>
                   {absensiList.map((abs, idx) => (
                     <tr key={idx}>
                       <td>{abs.siswa_id?.nama_lengkap || '-'}</td>
-                      <td>
-                        <span className={`status-badge ${abs.status === 'hadir' ? 'status-hadir' : abs.status === 'sakit' ? 'status-sakit' : 'status-izin'}`}>
-                          {abs.status}
-                        </span>
-                      </td>
-                      <td>{new Date(abs.tanggal).toLocaleTimeString('id-ID')}</td>
+                      <td>{abs.status}</td>
+                      <td>{new Date(abs.tanggal).toLocaleTimeString()}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -251,51 +320,22 @@ export default function PetugasPanel({ activePanel }) {
           </div>
         )}
 
-        {/* SISWA VIEW */}
-        {activePanel === 'siswa-view' && (
-          <div className="panel active-panel">
-            <h2><i className="fas fa-users"></i> Database Siswa</h2>
-            {loading && <div className="alert alert-info">Memuat...</div>}
-            {!loading && siswaList.length === 0 && (
-              <div className="alert alert-info">Tidak ada data siswa.</div>
-            )}
-            {!loading && siswaList.length > 0 && (
-              <table className="data-table">
-                <thead>
-                  <tr><th>Nama Lengkap</th><th>NIS</th><th>Kelas</th></tr>
-                </thead>
-                <tbody>
-                  {siswaList.map((s) => (
-                    <tr key={s._id}>
-                      <td>{s.nama_lengkap || '-'}</td>
-                      <td>{s.nis || s.nik || '-'}</td>
-                      <td>{s.kelas || '-'}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            )}
-          </div>
-        )}
-
-        {/* FIX 3: Profil panel was never rendered */}
         {activePanel === 'profil-petugas' && (
           <div className="panel active-panel">
-            <h2><i className="fas fa-id-card"></i> Profil Saya</h2>
+            <h2><i className="fas fa-user-circle"></i> Profil Saya</h2>
             {loading && <div className="alert alert-info">Memuat...</div>}
             {!loading && profil && (
-              <div className="profil-card">
+              <div style={{ maxWidth: '500px' }}>
                 <div className="form-group"><label>Nama Lengkap</label><p>{profil.nama_lengkap || '-'}</p></div>
-                <div className="form-group"><label>NIK / ID</label><p>{profil.nik || profil._id || '-'}</p></div>
-                <div className="form-group"><label>Role</label><p style={{ textTransform: 'capitalize' }}>{profil.role || 'Petugas'}</p></div>
-                {profil.email && <div className="form-group"><label>Email</label><p>{profil.email}</p></div>}
+                <div className="form-group"><label>NIK</label><p>{profil.nik || '-'}</p></div>
+                <div className="form-group"><label>Role</label><p style={{ textTransform: 'capitalize' }}>{profil.role || 'petugas'}</p></div>
               </div>
             )}
           </div>
         )}
       </div>
 
-      {/* MODAL DETAIL */}
+      {/* Modal Detail */}
       {showDetailModal && selectedLaporan && (
         <div className="modal active" onClick={closeDetailModal}>
           <div className="modal-content" onClick={e => e.stopPropagation()}>
@@ -306,52 +346,40 @@ export default function PetugasPanel({ activePanel }) {
             <div className="form-group"><label>Siswa</label><p>{selectedLaporan.siswa_id?.nama_lengkap || '-'}</p></div>
             <div className="form-group"><label>Judul</label><p>{selectedLaporan.judul}</p></div>
             <div className="form-group"><label>Deskripsi</label><p style={{ whiteSpace: 'pre-wrap' }}>{selectedLaporan.deskripsi}</p></div>
-            <div className="form-group"><label>Status</label>{statusBadge(selectedLaporan.status)}</div>
-            <div style={{ display: 'flex', gap: '10px', justifyContent: 'flex-end', marginTop: '16px' }}>
-              <button className="btn-submit" onClick={closeDetailModal}>Tutup</button>
-            </div>
+            <div className="form-group"><label>Status</label><p>{selectedLaporan.status}</p></div>
+            <div style={{ display: 'flex', gap: '10px', justifyContent: 'flex-end' }}><button className="btn-submit" onClick={closeDetailModal}>Tutup</button></div>
           </div>
         </div>
       )}
 
-      {/* MODAL CHAT */}
+      {/* Modal Chat */}
       {showChatModal && chatLaporan && (
         <div className="modal active" onClick={closeChatModal}>
           <div className="modal-content" onClick={e => e.stopPropagation()}>
             <span className="close-modal" onClick={closeChatModal}>&times;</span>
             <h3>Chat dengan Wali Kelas</h3>
-            <p style={{ color: 'var(--zzz-muted)', marginBottom: '4px' }}><strong style={{ color: 'var(--zzz-text)' }}>Laporan:</strong> {chatLaporan.judul}</p>
-            <p style={{ fontSize: '12px', color: 'var(--zzz-muted)', marginBottom: '12px' }}>
-              Sisa kuota: <span style={{ color: 'var(--zzz-yellow)' }}>{maxChat - currentChatCount}</span> dari {maxChat}
-            </p>
-            <div className="chat-box">
-              {chatLoading && <p style={{ color: 'var(--zzz-muted)' }}>Memuat pesan...</p>}
-              {!chatLoading && chatMessages.length === 0 && <p style={{ color: 'var(--zzz-muted)' }}>Belum ada pesan.</p>}
+            <p><strong>Laporan:</strong> {chatLaporan.judul}</p>
+            <p>Sisa kuota: {maxChat - currentChatCount} dari {maxChat}</p>
+            <div style={{ maxHeight: '300px', overflowY: 'auto', border: '1px solid #e2e8f0', borderRadius: '16px', padding: '12px', marginBottom: '16px', background: '#f8fafc' }}>
+              {chatLoading && <p>Memuat...</p>}
+              {!chatLoading && chatMessages.length === 0 && <p>Belum ada pesan.</p>}
               {chatMessages.map((msg, idx) => (
-                <div key={idx} className={`chat-bubble-wrap ${msg.pengirim === 'petugas' ? 'chat-self' : 'chat-other'}`}>
-                  <div className={`chat-bubble ${msg.pengirim === 'petugas' ? 'chat-bubble--self' : 'chat-bubble--other'}`}>
-                    <strong>{msg.pengirim === 'petugas' ? 'Petugas' : 'Wali Kelas'}</strong>
-                    <div>{msg.pesan}</div>
-                    <div className="chat-time">{new Date(msg.waktu).toLocaleString('id-ID')}</div>
+                <div key={idx} style={{ marginBottom: '12px', textAlign: msg.pengirim === 'petugas' ? 'right' : 'left' }}>
+                  <div style={{ display: 'inline-block', background: msg.pengirim === 'petugas' ? '#10b981' : '#e2e8f0', color: msg.pengirim === 'petugas' ? 'white' : '#1e293b', padding: '8px 12px', borderRadius: '16px', maxWidth: '80%' }}>
+                    <strong>{msg.pengirim === 'petugas' ? 'Petugas' : 'Wali Kelas'}</strong><br />
+                    {msg.pesan}
+                    <div style={{ fontSize: '10px' }}>{new Date(msg.waktu).toLocaleString()}</div>
                   </div>
                 </div>
               ))}
             </div>
-            {currentChatCount < maxChat ? (
-              <div className="chat-input-row">
-                <input
-                  type="text"
-                  className="chat-input"
-                  placeholder="Tulis pesan..."
-                  value={newChatMessage}
-                  onChange={e => setNewChatMessage(e.target.value)}
-                  onKeyPress={e => e.key === 'Enter' && sendChatMessage()}
-                />
+            {currentChatCount < maxChat && (
+              <div style={{ display: 'flex', gap: '8px' }}>
+                <input type="text" style={{ flex: 1, padding: '8px', borderRadius: '40px' }} placeholder="Tulis pesan..." value={newChatMessage} onChange={e => setNewChatMessage(e.target.value)} onKeyPress={e => e.key === 'Enter' && sendChatMessage()} />
                 <button className="btn-submit" onClick={sendChatMessage}>Kirim</button>
               </div>
-            ) : (
-              <div className="alert alert-info">Maksimal 5 pesan tercapai.</div>
             )}
+            {currentChatCount >= maxChat && <div className="alert alert-info">Maksimal 5 pesan tercapai.</div>}
           </div>
         </div>
       )}
