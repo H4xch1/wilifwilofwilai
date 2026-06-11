@@ -44,7 +44,6 @@ export default function Sidebar({ user, activePanel, setActivePanel }) {
         { id: 'dashboard', icon: 'fa-tachometer-alt', label: 'Dashboard' },
         { divider: true },
         { id: 'siswa-bimbingan', icon: 'fa-users', label: 'Siswa Bimbingan' },
-        { id: 'absensi-walas', icon: 'fa-chart-line', label: 'Rekap Absensi' },
         { id: 'kirim-laporan', icon: 'fa-exclamation-triangle', label: 'Kirim Laporan Kasus' },
         { id: 'riwayat-laporan', icon: 'fa-list', label: 'Riwayat Laporan' },
         { id: 'profil-walas', icon: 'fa-id-card', label: 'Profil Saya' },
