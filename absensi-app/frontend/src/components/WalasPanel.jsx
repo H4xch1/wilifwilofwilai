@@ -171,8 +171,17 @@ export default function WalasPanel({ activePanel }) {
     if (showAbsensi) {
       return (
         <div className="panel active-panel">
-          <h2>Rekap Absensi</h2>
-          <div className="alert alert-info">Siswa: {viewingSiswa?.nama_lengkap}</div>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+            <h2 style={{ margin: 0 }}>Rekap Absensi</h2>
+            <button
+              onClick={exportToExcel}
+              className="btn-submit"
+              style={{ background: '#16a34a', fontSize: '12px', padding: '8px 18px' }}
+            >
+              <i className="fas fa-file-excel" style={{ marginRight: '6px' }}></i>Export Excel
+            </button>
+          </div>
+          <div className="alert alert-info">Siswa: <strong>{viewingSiswa?.nama_lengkap}</strong></div>
           {loading && <div className="alert alert-info">Memuat...</div>}
           {!loading && absensiSiswa.length === 0 && <div className="alert alert-info">Belum ada data absensi.</div>}
           {!loading && absensiSiswa.length > 0 && (
@@ -204,88 +213,89 @@ export default function WalasPanel({ activePanel }) {
         <h2>Siswa Bimbingan</h2>
         {loading && <div className="alert alert-info">Memuat...</div>}
         {!loading && siswaList.length === 0 && <div className="alert alert-info">Belum ada siswa bimbingan.</div>}
-        {!loading && siswaList.length > 0 && (
-          siswaList.map(siswa => (
-            <div
-              key={siswa._id}
-              onClick={() => setSelectedSiswa(siswa)}
-              style={{
-                background: '#1e293b',
-                padding: '12px 16px',
-                borderRadius: '8px',
-                marginBottom: '12px',
-                borderLeft: '3px solid #f5c518',
-                cursor: 'pointer',
-                transition: 'background 0.2s',
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center'
-              }}
-              onMouseOver={e => e.currentTarget.style.background = '#2d3748'}
-              onMouseOut={e => e.currentTarget.style.background = '#1e293b'}
-            >
-              <div>
-                <strong style={{ color: '#f5c518', fontSize: '15px' }}>{siswa.nama_lengkap}</strong>
-                <span style={{ color: '#94a3b8', fontSize: '13px', marginLeft: '8px' }}>
-                  (NIS: {siswa.nis || '-'})
-                </span>
-              </div>
-              <span style={{ color: '#64748b', fontSize: '12px' }}>
-                Detail <i className="fas fa-chevron-right"></i>
+        {!loading && siswaList.length > 0 && siswaList.map(siswa => (
+          <div
+            key={siswa._id}
+            onClick={() => setSelectedSiswa(siswa)}
+            style={{
+              background: '#1e293b',
+              padding: '12px 16px',
+              borderRadius: '8px',
+              marginBottom: '12px',
+              borderLeft: '3px solid #f5c518',
+              cursor: 'pointer',
+              transition: 'background 0.2s',
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+            }}
+            onMouseOver={e => e.currentTarget.style.background = '#2d3748'}
+            onMouseOut={e => e.currentTarget.style.background = '#1e293b'}
+          >
+            <div>
+              <strong style={{ color: '#f5c518', fontSize: '15px' }}>{siswa.nama_lengkap}</strong>
+              <span style={{ color: '#94a3b8', fontSize: '13px', marginLeft: '8px' }}>
+                (NIS: {siswa.nis || '-'})
               </span>
             </div>
-          ))
-        )}
+            <span style={{ color: '#64748b', fontSize: '12px' }}>
+              Detail <i className="fas fa-chevron-right"></i>
+            </span>
+          </div>
+        ))}
 
-        {/* ===== MODAL DETAIL SISWA ===== */}
+        {/* Modal Detail Siswa */}
         {selectedSiswa && (
           <div
-            onClick={() => setSelectedSiswa(null)}
             style={{
               position: 'fixed', top: 0, left: 0, width: '100%', height: '100%',
               background: 'rgba(0,0,0,0.75)', zIndex: 9999,
               display: 'flex', alignItems: 'center', justifyContent: 'center',
-              backdropFilter: 'blur(4px)', padding: '20px'
+              backdropFilter: 'blur(4px)',
             }}
+            onClick={() => setSelectedSiswa(null)}
           >
             <div
               onClick={e => e.stopPropagation()}
               style={{
-                background: '#1e293b', borderRadius: '10px', padding: '28px',
-                minWidth: '320px', maxWidth: '460px', width: '100%',
-                boxShadow: '0 20px 60px rgba(0,0,0,0.6)',
+                background: '#1e293b',
                 border: '1px solid #334155',
-                borderTop: '2px solid #f5c518'
+                borderTop: '3px solid #f5c518',
+                borderRadius: '8px',
+                padding: '28px',
+                width: '90%',
+                maxWidth: '460px',
+                boxShadow: '0 20px 60px rgba(0,0,0,0.6)',
               }}
             >
-              {/* Header */}
+              {/* Header modal */}
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-                <h3 style={{ margin: 0, color: '#f5c518', fontSize: '17px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <i className="fas fa-user-circle"></i> Detail Siswa
+                <h3 style={{ margin: 0, color: '#f5c518', fontFamily: 'Rajdhani, sans-serif', fontSize: '18px', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+                  <i className="fas fa-user-circle" style={{ marginRight: '8px' }}></i>Detail Siswa
                 </h3>
                 <button
                   onClick={() => setSelectedSiswa(null)}
-                  style={{ background: 'transparent', border: 'none', color: '#64748b', fontSize: '20px', cursor: 'pointer' }}
+                  style={{ background: 'transparent', border: 'none', color: '#94a3b8', fontSize: '22px', cursor: 'pointer', lineHeight: 1, padding: '0 4px' }}
                 >
                   <i className="fas fa-times"></i>
                 </button>
               </div>
 
-              {/* Info */}
+              {/* Info siswa */}
               <table style={{ width: '100%', borderCollapse: 'collapse', marginBottom: '22px' }}>
                 <tbody>
                   {[
                     ['Nama Lengkap', selectedSiswa.nama_lengkap],
-                    ['NIS',          selectedSiswa.nis || '-'],
-                    ['NIK',          selectedSiswa.nik || '-'],
+                    ['NIS', selectedSiswa.nis || '-'],
+                    ['NIK', selectedSiswa.nik || '-'],
                     ['Tanggal Lahir', selectedSiswa.tanggal_lahir
                       ? new Date(selectedSiswa.tanggal_lahir).toLocaleDateString('id-ID')
                       : '-'],
-                    ['Kelas',        selectedSiswa.kelas || '-'],
+                    ['Kelas', selectedSiswa.kelas || '-'],
                   ].map(([label, value]) => (
                     <tr key={label} style={{ borderBottom: '1px solid #334155' }}>
-                      <td style={{ color: '#94a3b8', padding: '8px 4px', fontSize: '12px', width: '40%', textTransform: 'uppercase', letterSpacing: '0.05em' }}>{label}</td>
-                      <td style={{ color: '#e2e8f0', padding: '8px 4px', fontSize: '14px', fontWeight: '600' }}>{value}</td>
+                      <td style={{ color: '#94a3b8', padding: '9px 0', fontSize: '12px', letterSpacing: '0.05em', textTransform: 'uppercase', width: '42%' }}>{label}</td>
+                      <td style={{ color: '#e2e8f0', padding: '9px 0', fontSize: '14px', fontWeight: '600' }}>{value}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -294,22 +304,22 @@ export default function WalasPanel({ activePanel }) {
               {/* Tombol aksi */}
               <div style={{ display: 'flex', gap: '10px' }}>
                 <button
-                  onClick={() => { setSelectedSiswa(null); handleLihatAbsensi(selectedSiswa._id); }}
-                  style={{
-                    flex: 1, background: 'linear-gradient(135deg, #11998e, #38ef7d)',
-                    color: '#0a0c10', border: 'none', padding: '11px 16px',
-                    borderRadius: '6px', cursor: 'pointer', fontWeight: '700',
-                    fontSize: '13px', letterSpacing: '0.05em', textTransform: 'uppercase'
+                  className="btn-submit"
+                  onClick={() => {
+                    setSelectedSiswa(null);
+                    handleLihatAbsensi(selectedSiswa._id);
                   }}
+                  style={{ flex: 1, background: 'linear-gradient(135deg, #11998e, #38ef7d)', color: '#0a0c10' }}
                 >
-                  <i className="fas fa-calendar-check" style={{ marginRight: '6px' }}></i>
-                  Lihat Absensi
+                  <i className="fas fa-calendar-check" style={{ marginRight: '7px' }}></i>Lihat Absensi
                 </button>
                 <button
                   onClick={() => setSelectedSiswa(null)}
                   style={{
                     background: '#334155', color: '#94a3b8', border: 'none',
-                    padding: '11px 18px', borderRadius: '6px', cursor: 'pointer', fontSize: '13px'
+                    padding: '10px 18px', borderRadius: '3px', cursor: 'pointer',
+                    fontSize: '12px', fontWeight: '700', letterSpacing: '0.06em',
+                    textTransform: 'uppercase', fontFamily: 'Barlow, sans-serif',
                   }}
                 >
                   Tutup
