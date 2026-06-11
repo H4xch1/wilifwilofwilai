@@ -106,6 +106,7 @@ const exportToExcel = () => {
   };
 
   const handleLihatAbsensi = async (siswaId) => {
+  console.log("Tombol diklik, ID:", siswaId);
     setLoading(true);
     try {
       const res = await api.get(`/absensi/walas/${siswaId}`);
