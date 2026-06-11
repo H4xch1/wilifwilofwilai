@@ -36,37 +36,7 @@ export default function WalasPanel({ activePanel }) {
       return;
 
     }
-    if (showAbsensi && viewingSiswa) {
-    return (
-      <div className="panel active-panel">
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <h2>Absensi: {viewingSiswa.nama_lengkap}</h2>
-          <div>
-            <button onClick={() => setShowAbsensi(false)}>Kembali</button>
-            <button onClick={exportToExcel} style={{ marginLeft: '10px' }}>Export Excel</button>
-          </div>
-        </div>
-        
-        <table className="data-table">
-          <thead>
-            <tr>
-              <th>Tanggal</th>
-              <th>Status</th>
-              <th>Keterangan</th>
-            </tr>
-          </thead>
-          <tbody>
-            {absensiSiswa.map((a, i) => (
-              <tr key={i}>
-                <td>{a.tanggal}</td>
-                <td>{a.status}</td>
-                <td>{a.keterangan || '-'}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-    );
+
   }
 
     const worksheet = XLSX.utils.json_to_sheet(absensiSiswa.map((a, i) => ({
@@ -196,34 +166,37 @@ export default function WalasPanel({ activePanel }) {
   }
 
   if (activePanel === 'siswa-bimbingan') {
-    if (showAbsensi) {
-      return (
-        <div className="panel active-panel">
-          <h2>Rekap Absensi</h2>
-          <div className="alert alert-info">Siswa: {viewingSiswa?.nama_lengkap}</div>
-          {loading && <div className="alert alert-info">Memuat...</div>}
-          {!loading && absensiSiswa.length === 0 && <div className="alert alert-info">Belum ada data absensi.</div>}
-          {!loading && absensiSiswa.length > 0 && (
-            <table className="data-table">
-              <thead>
-                <tr><th>Tanggal</th><th>Status</th><th>Foto</th></tr>
-              </thead>
-              <tbody>
-                {absensiSiswa.map((a, i) => (
-                  <tr key={i}>
-                    <td>{a.tanggal}</td>
-                    <td><span className={`status-badge status-${a.status}`}>{a.status}</span></td>
-                    <td>{a.foto_kamera ? <a href={`${API_URL.replace('/api', '')}/${a.foto_kamera}`} target="_blank" rel="noopener noreferrer">Lihat</a> : '-'}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          )}
-          <button className="btn-submit" style={{ marginTop: '15px' }} onClick={handleBackToSiswa}>
-            ← Kembali ke Siswa Bimbingan
-          </button>
+    if (showAbsensi && viewingSiswa) {
+    return (
+      <div className="panel active-panel">
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <h2>Absensi: {viewingSiswa.nama_lengkap}</h2>
+          <div>
+            <button onClick={() => setShowAbsensi(false)}>Kembali</button>
+            <button onClick={exportToExcel} style={{ marginLeft: '10px' }}>Export Excel</button>
+          </div>
         </div>
-      );
+        
+        <table className="data-table">
+          <thead>
+            <tr>
+              <th>Tanggal</th>
+              <th>Status</th>
+              <th>Keterangan</th>
+            </tr>
+          </thead>
+          <tbody>
+            {absensiSiswa.map((a, i) => (
+              <tr key={i}>
+                <td>{a.tanggal}</td>
+                <td>{a.status}</td>
+                <td>{a.keterangan || '-'}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    );
     }
 
     // TAMPILAN DAFTAR SISWA BIMBINGAN (diperbaiki kontrasnya)
@@ -343,4 +316,3 @@ export default function WalasPanel({ activePanel }) {
   }
 
   return <div className="panel active-panel"><p>Panel tidak ditemukan: {activePanel}</p></div>;
-}
