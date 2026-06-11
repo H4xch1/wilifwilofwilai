@@ -47,7 +47,7 @@ const exportToExcel = () => {
     XLSX.utils.book_append_sheet(workbook, worksheet, "Absensi");
     XLSX.writeFile(workbook, `Absensi_${viewingSiswa?.nama_lengkap || 'Siswa'}.xlsx`);
   }; // <--- Nah, tutup fungsinya di sini!
-}
+
 
   const fetchSiswaBimbingan = async () => {
     setLoading(true);
@@ -315,3 +315,4 @@ const exportToExcel = () => {
   }
 
   return <div className="panel active-panel"><p>Panel tidak ditemukan: {activePanel}</p></div>;
+}
