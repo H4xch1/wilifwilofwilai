@@ -92,15 +92,20 @@ export default function Sidebar({ user, activePanel, setActivePanel }) {
           <button className="hamburger-btn" onClick={toggleSidebar}>
             <i className="fas fa-bars"></i>
           </button>
-          <div className="logo-wrapper">
-            <img src="/images/logo-navbar.png" alt="Logo" className="sidebar-logo" />
-            {isExpanded && (
-              <>
-                <h2>AbsenCerdas</h2>
-                <p>Digital Attendance</p>
-              </>
-            )}
-          </div>
+
+          {/* Logo gambar - tampil baik expand maupun collapse (tanpa ikon daun) */}
+          <img
+            src="/images/logo/logo-navbar.png"
+            alt="Logo"
+            className="sidebar-logo"
+            onError={(e) => (e.target.src = 'https://cdn-icons-png.flaticon.com/512/2838/2838912.png')}
+          />
+          {isExpanded && (
+            <>
+              <h2>AbsenCerdas</h2>
+              <p>Digital Attendance</p>
+            </>
+          )}
         </div>
 
         <div className="sidebar-menu">
