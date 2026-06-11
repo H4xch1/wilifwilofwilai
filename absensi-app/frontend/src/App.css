@@ -11,8 +11,8 @@
   height: 100%;
   background: var(--zzz-surface);
   color: var(--zzz-text);
-  transition: all 0.3s;
-  z-index: 100;
+  transition: width 0.3s ease, transform 0.3s ease;
+  z-index: 1000;
   overflow-y: auto;
   border-right: 1px solid var(--zzz-border);
   /* ZZZ-style clip corner */
@@ -28,12 +28,28 @@
   background: linear-gradient(90deg, var(--zzz-yellow), var(--zzz-orange));
 }
 
+/* Saat collapsed, sidebar mengecil jadi icon-only */
+.sidebar.collapsed {
+  width: 70px;
+}
+
 .sidebar-header {
   padding: 28px 24px 22px;
   text-align: left;
   border-bottom: 1px solid var(--zzz-border);
   position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
 }
+
+.sidebar-header img {
+  width: 50px;
+  height: 50px;
+  margin-bottom: 8px;
+  object-fit: contain;
+}
+
 .sidebar-header h2 {
   font-family: 'Rajdhani', sans-serif;
   font-size: 22px;
@@ -50,6 +66,25 @@
   letter-spacing: 0.15em;
   text-transform: uppercase;
   color: var(--zzz-muted);
+  margin: 0;
+}
+
+/* Collapsed header */
+.sidebar.collapsed .sidebar-header {
+  padding: 20px 0;
+  align-items: center;
+}
+.sidebar.collapsed .sidebar-header h2,
+.sidebar.collapsed .sidebar-header p,
+.sidebar.collapsed .sidebar-header img {
+  display: none;
+}
+.sidebar.collapsed .logo-icon-only {
+  display: flex;
+  justify-content: center;
+  font-size: 28px;
+  color: #f5c518;
+  margin: 10px 0;
 }
 
 .sidebar-menu { padding: 16px 0; }
@@ -92,6 +127,20 @@
 }
 .menu-item.active i { text-shadow: 0 0 10px var(--zzz-glow-y); }
 
+/* Collapsed menu items */
+.sidebar.collapsed .menu-item {
+  justify-content: center;
+  padding: 10px 0;
+  margin: 3px 0;
+  width: 100%;
+  border-left: none;
+  border-right: 2px solid transparent;
+}
+.sidebar.collapsed .menu-item span { display: none; }
+.sidebar.collapsed .menu-item i { margin: 0; font-size: 18px; width: auto; }
+.sidebar.collapsed .menu-item:hover { border-right-color: var(--zzz-yellow); transform: none; }
+.sidebar.collapsed .menu-item.active { border-right-color: var(--zzz-yellow); }
+
 .menu-divider {
   height: 1px;
   background: var(--zzz-border);
@@ -102,10 +151,13 @@
 .main-content {
   margin-left: 270px;
   min-height: 100vh;
-  transition: all 0.3s ease;
+  transition: margin-left 0.3s ease;
   padding: 20px;
   position: relative;
   z-index: 1;
+}
+.sidebar.collapsed ~ .main-content {
+  margin-left: 70px;
 }
 
 /* ---------- TOP BAR ---------- */
@@ -118,7 +170,6 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  /* ZZZ corner cut */
   clip-path: polygon(0 0, calc(100% - 14px) 0, 100% 14px, 100% 100%, 0 100%);
   border-top: 2px solid var(--zzz-yellow);
   position: relative;
@@ -197,7 +248,7 @@
   transition: all 0.2s;
   clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 0 100%);
   position: relative;
-  overflow: hidden;
+  /* DIHAPUS: overflow hidden — bisa ngurungin modal */
 }
 .stat-card::before {
   content: '';
@@ -246,7 +297,7 @@
   color: var(--zzz-text);
   margin-bottom: 28px;
   position: relative;
-  overflow: hidden;
+  /* DIHAPUS: overflow hidden — bisa ngurungin modal */
   clip-path: polygon(0 0, calc(100% - 20px) 0, 100% 20px, 100% 100%, 0 100%);
 }
 .welcome-section::after {
@@ -278,7 +329,7 @@
   display: none;
   margin-bottom: 20px;
   position: relative;
-  clip-path: polygon(0 0, calc(100% - 16px) 0, 100% 16px, 100% 100%, 0 100%);
+  /* DIHAPUS: clip-path — motong area klik di sudut kanan atas! */
 }
 .panel::before {
   content: '';
@@ -536,28 +587,42 @@
 .modal {
   display: none;
   position: fixed;
-  z-index: 9999; 
+  z-index: 9999;
   left: 0; top: 0;
   width: 100%; height: 100%;
   background: rgba(0,0,0,0.85);
   backdrop-filter: blur(6px);
   justify-content: center;
   align-items: center;
-  overflow-y: auto; 
+  overflow-y: auto;
   padding: 20px;
 }
 .modal.active { display: flex; }
+
+/* modal-overlay: dipakai di WalasPanel, MuridPanel (inline style) */
+.modal-overlay {
+  position: fixed;
+  z-index: 9999;
+  left: 0; top: 0;
+  width: 100%; height: 100%;
+  background: rgba(0,0,0,0.85);
+  backdrop-filter: blur(6px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+}
 
 .modal-content {
   background: var(--zzz-card);
   border: 1px solid var(--zzz-border);
   border-top: 2px solid var(--zzz-yellow);
   width: 100%;
-  max-width: 600px; 
+  max-width: 600px;
   border-radius: 4px;
   padding: 26px;
   position: relative;
-  clip-path: none; 
+  clip-path: none;
   box-shadow: 0 10px 40px rgba(0,0,0,0.5);
   margin: auto;
 }
@@ -571,16 +636,7 @@
 }
 .close-modal:hover { color: var(--zzz-yellow); }
 
-/* ---------- RESPONSIVE ---------- */
-@media (max-width: 768px) {
-  .sidebar { transform: translateX(-100%); width: 0; }
-  .sidebar.sidebar-open { transform: translateX(0); width: 270px; }
-  .main-content { margin-left: 0; }
-  .top-bar { margin: 0 0 16px 0; }
-  .stats-grid { grid-template-columns: 1fr; }
-}
-
-/* Tombol hamburger global di pojok kiri atas */
+/* ---------- HAMBURGER ---------- */
 .global-hamburger {
   position: fixed;
   top: 15px;
@@ -600,128 +656,34 @@
   transition: 0.2s;
   backdrop-filter: blur(4px);
 }
-
 .global-hamburger:hover {
   background: rgba(0, 0, 0, 0.9);
   transform: scale(1.05);
 }
 
-/* Sidebar */
-.sidebar {
-  position: fixed;
-  left: 0;
-  top: 0;
-  width: 280px;
-  height: 100%;
-  color: #e2e8f0;
-  transition: width 0.3s ease, transform 0.3s ease;
-  z-index: 1000;
-  overflow-y: auto;
-  transform: translateX(0);
+/* ---------- HAMBURGER BUTTON IN SIDEBAR ---------- */
+.hamburger-btn {
+  background: transparent;
+  border: none;
+  color: var(--zzz-muted);
+  font-size: 18px;
+  cursor: pointer;
+  padding: 4px 8px;
+  margin-bottom: 8px;
+  transition: color 0.2s;
+  align-self: flex-start;
 }
+.hamburger-btn:hover { color: var(--zzz-yellow); }
 
-/* Saat collapsed, sidebar tidak disembunyikan total, hanya mengecil */
-.sidebar.collapsed {
-  width: 70px;
-}
-
-/* Konten utama bergeser sesuai lebar sidebar */
-.main-content {
-  margin-left: 280px;
-  transition: margin-left 0.3s ease;
-}
-
-.sidebar.collapsed ~ .main-content {
-  margin-left: 70px;
-}
-
-/* Header di dalam sidebar (posisi teks ke kiri) */
-.sidebar-header {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  text-align: left;
-  padding: 20px 20px 20px 24px;
-}
-
-.sidebar-header img {
+/* Sidebar logo */
+.sidebar-logo {
   width: 50px;
   height: 50px;
-  margin-bottom: 8px;
   object-fit: contain;
+  margin-bottom: 4px;
 }
 
-.sidebar-header h2 {
-  font-size: 1.3rem;
-  margin: 8px 0 4px;
-  letter-spacing: 0.05em;
-  color: #f5c518;
-}
-
-.sidebar-header p {
-  font-size: 0.7rem;
-  margin: 0;
-}
-
-/* Saat collapsed, header diatur ulang */
-.sidebar.collapsed .sidebar-header {
-  padding: 20px 0;
-  align-items: center;
-}
-
-.sidebar.collapsed .sidebar-header h2,
-.sidebar.collapsed .sidebar-header p,
-.sidebar.collapsed .sidebar-header img {
-  display: none;
-}
-
-.sidebar.collapsed .logo-icon-only {
-  display: flex;
-  justify-content: center;
-  font-size: 28px;
-  color: #f5c518;
-  margin: 10px 0;
-}
-
-/* Menu item */
-.menu-item {
-  padding: 10px 16px;
-  margin: 4px 12px;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: all 0.2s;
-  background: none;
-  border: none;
-  color: #cbd5e1;
-  width: calc(100% - 24px);
-  text-align: left;
-}
-
-.menu-item i {
-  width: 20px;
-  font-size: 16px;
-}
-
-
-
-.sidebar.collapsed .menu-item {
-  justify-content: center;
-  padding: 10px 0;
-}
-
-.sidebar.collapsed .menu-item span {
-  display: none;
-}
-
-.sidebar.collapsed .menu-item i {
-  margin: 0;
-  font-size: 18px;
-}
-
-/* Responsif: di layar kecil, sidebar disembunyikan saat collapsed */
+/* ---------- RESPONSIVE ---------- */
 @media (max-width: 768px) {
   .global-hamburger {
     position: fixed;
@@ -731,6 +693,7 @@
   }
   .sidebar {
     transform: translateX(0);
+    width: 270px;
   }
   .sidebar.collapsed {
     transform: translateX(-100%);
@@ -742,5 +705,6 @@
   .main-content {
     margin-left: 0;
   }
+  .top-bar { margin: 0 0 16px 0; }
+  .stats-grid { grid-template-columns: 1fr; }
 }
-
