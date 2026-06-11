@@ -29,26 +29,25 @@ export default function WalasPanel({ activePanel }) {
   const [profil, setProfil] = useState(null);
   const [loading, setLoading] = useState(false);
 
-  // === PERUBAHAN: Fungsi baru buat Export Excel ===
-  const exportToExcel = () => {
+const exportToExcel = () => {
     if (absensiSiswa.length === 0) {
       alert("Data absensi kosong!");
       return;
+    } // <--- Jangan tutup fungsi di sini bray!
 
-    }
-
-  }
-
+    // Logic-nya harus di dalem sini, baru ditutup di paling bawah
     const worksheet = XLSX.utils.json_to_sheet(absensiSiswa.map((a, i) => ({
       No: i + 1,
       Tanggal: a.tanggal,
       Status: a.status,
-      Keterangan: a.keterangan
+      Keterangan: a.keterangan || '-' // Tambahin biar gak undefined
     })));
+
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, "Absensi");
     XLSX.writeFile(workbook, `Absensi_${viewingSiswa?.nama_lengkap || 'Siswa'}.xlsx`);
-  };
+  }; // <--- Nah, tutup fungsinya di sini!
+}
 
   const fetchSiswaBimbingan = async () => {
     setLoading(true);
