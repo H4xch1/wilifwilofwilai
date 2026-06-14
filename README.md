@@ -69,7 +69,7 @@ brew services start mongodb-community
 
 ```
 
-### 2. Backend Architecture Setup
+### 2. Backend Architecture Setup [ASSUME if you wanna run locally see: https://github.com/H4xch1/wilifwilofwilai/tree/5106b57b07a3dbe8fc636a5a3b3f9e98d28d8250]
 
 ```bash
 cd backend
