@@ -209,28 +209,36 @@ export default function WalasPanel({ activePanel }) {
                         {a.status}
                       </span>
                     </td>
-                    <td>
+                    <td style={{ textAlign: 'center' }}>
                       {a.foto_kamera ? (
-                        <div
+                        <button
                           onClick={() => setPreviewImage(getImageUrl(a.foto_kamera))}
                           style={{
-                            display: 'block',
-                            width: '100%',
-                            padding: '10px',
-                            textAlign: 'center',
-                            background: '#f5c518',
-                            color: '#0a0c10',
-                            fontWeight: 'bold',
+                            background: 'transparent',
+                            border: '1px solid #f5c518',
+                            color: '#f5c518',
+                            padding: '5px 12px',
+                            borderRadius: '20px',
                             cursor: 'pointer',
-                            borderRadius: '4px',
                             fontSize: '12px',
-                            textTransform: 'uppercase'
+                            transition: 'all 0.2s',
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: '6px'
+                          }}
+                          onMouseOver={(e) => {
+                            e.currentTarget.style.background = '#f5c518';
+                            e.currentTarget.style.color = '#0a0c10';
+                          }}
+                          onMouseOut={(e) => {
+                            e.currentTarget.style.background = 'transparent';
+                            e.currentTarget.style.color = '#f5c518';
                           }}
                         >
-                          Lihat Foto
-                        </div>
+                          <i className="fas fa-image"></i> Lihat
+                        </button>
                       ) : (
-                        <span style={{ color: '#475569', display: 'block', textAlign: 'center' }}>-</span>
+                        <span style={{ color: '#475569', fontSize: '12px' }}>-</span>
                       )}
                     </td>
                   </tr>
