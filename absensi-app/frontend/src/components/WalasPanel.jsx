@@ -209,36 +209,28 @@ export default function WalasPanel({ activePanel }) {
                         {a.status}
                       </span>
                     </td>
-                    <td style={{ textAlign: 'center' }}>
+                    <td style={{ padding: '0px' }}> {/* PADDING NOL DI SINI BIAR TOMBOL FULL */}
                       {a.foto_kamera ? (
-                        <button
+                        <div
                           onClick={() => setPreviewImage(getImageUrl(a.foto_kamera))}
                           style={{
-                            background: 'transparent',
-                            border: '1px solid #f5c518',
-                            color: '#f5c518',
-                            padding: '5px 12px',
-                            borderRadius: '20px',
+                            display: 'block',
+                            width: '100%',
+                            padding: '12px 10px', // Atur padding biar tombolnya pas
+                            textAlign: 'center',
+                            background: '#f5c518',
+                            color: '#0a0c10',
+                            fontWeight: 'bold',
                             cursor: 'pointer',
                             fontSize: '12px',
-                            transition: 'all 0.2s',
-                            display: 'inline-flex',
-                            alignItems: 'center',
-                            gap: '6px'
-                          }}
-                          onMouseOver={(e) => {
-                            e.currentTarget.style.background = '#f5c518';
-                            e.currentTarget.style.color = '#0a0c10';
-                          }}
-                          onMouseOut={(e) => {
-                            e.currentTarget.style.background = 'transparent';
-                            e.currentTarget.style.color = '#f5c518';
+                            textTransform: 'uppercase',
+                            height: '100%' // Biar ngebentang tinggi
                           }}
                         >
-                          <i className="fas fa-image"></i> Lihat
-                        </button>
+                          LIHAT FOTO
+                        </div>
                       ) : (
-                        <span style={{ color: '#475569', fontSize: '12px' }}>-</span>
+                        <span style={{ color: '#475569', display: 'block', textAlign: 'center' }}>-</span>
                       )}
                     </td>
                   </tr>
