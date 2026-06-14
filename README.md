@@ -1,5 +1,5 @@
-### Important
-#  AbsenCerdas - Digital Attendance Management System
+# Important
+###  AbsenCerdas - Digital Attendance Management System
 
 ## Project Architecture
 
