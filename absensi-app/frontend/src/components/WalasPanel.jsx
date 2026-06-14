@@ -62,7 +62,7 @@ export default function WalasPanel({ activePanel }) {
   const fetchSiswaBimbingan = async () => {
     setLoading(true);
     try {
-      const res = await api.get('/users/murid');
+      const res = await api.get('/users/murid/bimbingan');
       const data = Array.isArray(res.data) ? res.data : [];
       setSiswaList(data);
     } catch (err) {

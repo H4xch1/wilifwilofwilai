@@ -23,6 +23,18 @@ router.get('/murid', verifyToken, checkRole('admin', 'petugas', 'walas'), async 
   }
 });
 
+router.get('/murid/bimbingan', verifyToken, checkRole('walas'), async (req, res) => {
+  try {
+    const murid = await User.find({ 
+        role: 'murid', 
+        wali_kelas_id: req.user.userId 
+    });
+    res.json(murid);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
 router.get('/list/walas', verifyToken, async (req, res) => {
   try {
     const walas = await User.find({ role: 'walas' }, 'nama_lengkap');
