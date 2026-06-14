@@ -30,6 +30,15 @@ export default function WalasPanel({ activePanel }) {
   const [loading, setLoading] = useState(false);
   const [selectedSiswa, setSelectedSiswa] = useState(null); // modal detail siswa
 
+  const getImageUrl = (url) => {
+    if (!url) return '';
+    // Kalau URL udah ada http-nya (Cloudinary), jangan diapa-apain!
+    if (url.startsWith('http')) return url;
+    
+    // Kalau baru path biasa, baru tempelin base URL
+    return `${API_URL.replace('/api', '')}/${url}`;
+  };
+
   const exportToExcel = () => {
     if (absensiSiswa.length === 0) {
       alert("Data absensi kosong!");
