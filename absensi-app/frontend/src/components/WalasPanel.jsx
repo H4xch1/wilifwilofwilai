@@ -34,7 +34,7 @@ export default function WalasPanel({ activePanel }) {
     if (!url) return '';
     // Kalau URL udah ada http-nya (Cloudinary), jangan diapa-apain!
     if (url.startsWith('http')) return url;
-    
+
     // Kalau baru path biasa, baru tempelin base URL
     return `${API_URL.replace('/api', '')}/${url}`;
   };
@@ -200,11 +200,19 @@ export default function WalasPanel({ activePanel }) {
               </thead>
               <tbody>
                 {absensiSiswa.map((a, i) => (
-                  <tr key={i}>
-                    <td>{a.tanggal}</td>
-                    <td><span className={`status-badge status-${a.status}`}>{a.status}</span></td>
-                    <td>{a.foto_kamera ? <a href={`${API_URL.replace('/api', '')}/${a.foto_kamera}`} target="_blank" rel="noopener noreferrer">Lihat</a> : '-'}</td>
-                  </tr>
+                  <td>
+                    {a.foto_kamera ? (
+                      <a
+                        href={getImageUrl(a.foto_kamera)}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        Lihat Foto
+                      </a>
+                    ) : (
+                      '-'
+                    )}
+                  </td>
                 ))}
               </tbody>
             </table>
