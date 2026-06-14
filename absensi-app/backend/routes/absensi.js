@@ -83,8 +83,6 @@ router.get('/riwayat', verifyToken, checkRole('murid'), async (req, res) => {
   }
 });
 
-console.log("Cari siswa:", req.params.siswaId, "punya walas:", req.user.userId);
-
 // --- ROUTE GET SISWA BIMBINGAN (WALAS) ---
 router.get('/walas/:siswaId', verifyToken, checkRole('walas'), async (req, res) => {
   try {
