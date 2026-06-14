@@ -118,27 +118,54 @@ export default function Login({ setUser }) {
           overflow: 'hidden',
           boxShadow: '0 25px 50px -12px rgba(0,0,0,0.5)',
           backdropFilter: 'blur(12px)',
-          WebkitBackdropFilter: 'blur(12px)'
+          WebkitBackdropFilter: 'blur(12px)',
+          flexDirection: window.innerWidth <= 768 ? 'column' : 'row'
         }}>
           <div style={{
             flex: 1,
             background: 'linear-gradient(145deg, rgba(0, 0, 0, 0.5) 0%, rgba(15, 23, 42, 0.3) 100%)',
-            padding: '3rem',
+            padding: window.innerWidth <= 768 ? '2rem 1.5rem' : '3rem',
             display: 'flex',
             flexDirection: 'column',
             justifyContent: 'center',
             alignItems: 'center',
             textAlign: 'center',
-            borderRight: '1px solid rgba(255, 255, 255, 0.1)'
+            borderRight: window.innerWidth <= 768 ? 'none' : '1px solid rgba(255, 255, 255, 0.1)',
+            borderBottom: window.innerWidth <= 768 ? '1px solid rgba(255, 255, 255, 0.1)' : 'none'
           }}>
-            <img src="/images/logo-navbar.png" alt="Login" style={{ width: '200px', marginBottom: '1.5rem' }} />
-            <h2 style={{ fontSize: '1.8rem', color: '#ffffff', marginBottom: '0.5rem' }}>Selamat Datang!</h2>
-            <p style={{ color: '#cbd5e1' }}>Masuk ke dashboard<br />Sistem Absensi Cerdas</p>
+            <img 
+              src="/images/logo-navbar.png" 
+              alt="Login" 
+              style={{ 
+                width: window.innerWidth <= 768 ? '120px' : '200px', 
+                marginBottom: '1.5rem',
+                objectFit: 'contain'
+              }} 
+            />
+            <h2 style={{ 
+              fontSize: window.innerWidth <= 768 ? '1.4rem' : '1.8rem', 
+              color: '#ffffff', 
+              marginBottom: '0.5rem' 
+            }}>
+              Selamat Datang!
+            </h2>
+            <p style={{ 
+              color: '#cbd5e1',
+              fontSize: window.innerWidth <= 768 ? '0.9rem' : '1rem'
+            }}>
+              Masuk ke dashboard<br />Sistem Absensi Cerdas
+            </p>
           </div>
 
-          <div style={{ flex: 1, padding: '3rem' }}>
+          <div style={{ 
+            flex: 1, 
+            padding: window.innerWidth <= 768 ? '2rem 1.5rem' : '3rem',
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'center'
+          }}>
             <h1 style={{
-              fontSize: '2rem',
+              fontSize: window.innerWidth <= 768 ? '1.6rem' : '2rem',
               marginBottom: '0.5rem',
               background: 'linear-gradient(135deg, #66ea66 0%, #3f9245)',
               WebkitBackgroundClip: 'text',
@@ -147,17 +174,36 @@ export default function Login({ setUser }) {
             }}>
               <i className="fas fa-graduation-cap"></i> Login
             </h1>
-            <p style={{ marginBottom: '2rem', color: '#cbd5e1' }}>Masukkan NIK dan password Anda</p>
+            <p style={{ 
+              marginBottom: '2rem', 
+              color: '#cbd5e1',
+              fontSize: window.innerWidth <= 768 ? '0.9rem' : '1rem'
+            }}>
+              Masukkan NIK dan password Anda
+            </p>
 
             {error && (
-              <div style={{ marginBottom: '1.5rem', color: '#f87171', background: 'rgba(0,0,0,0.3)', padding: '12px', borderRadius: '12px' }}>
+              <div style={{ 
+                marginBottom: '1.5rem', 
+                color: '#f87171', 
+                background: 'rgba(0,0,0,0.3)', 
+                padding: '12px', 
+                borderRadius: '12px',
+                fontSize: window.innerWidth <= 768 ? '0.85rem' : '0.95rem'
+              }}>
                 <i className="fas fa-exclamation-triangle"></i> {error}
               </div>
             )}
 
-            <form onSubmit={handleSubmit}>
+            <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column' }}>
               <div style={{ marginBottom: '1.5rem' }}>
-                <label style={{ color: '#e2e8f0', display: 'block', marginBottom: '0.5rem', fontWeight: '500' }}>
+                <label style={{ 
+                  color: '#e2e8f0', 
+                  display: 'block', 
+                  marginBottom: '0.5rem', 
+                  fontWeight: '500',
+                  fontSize: window.innerWidth <= 768 ? '0.85rem' : '0.95rem'
+                }}>
                   <i className="fas fa-id-card" style={{ color: '#38ef7d', marginRight: '5px' }}></i> NIK
                 </label>
                 <input
@@ -174,13 +220,22 @@ export default function Login({ setUser }) {
                     border: '1px solid rgba(255,255,255,0.2)',
                     background: 'rgba(255,255,255,0.1)',
                     color: 'white',
-                    outline: 'none'
+                    outline: 'none',
+                    fontSize: window.innerWidth <= 768 ? '0.9rem' : '1rem'
                   }}
+                  onFocus={(e) => e.target.style.borderColor = '#38ef7d'}
+                  onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.2)'}
                 />
               </div>
 
-              <div style={{ marginBottom: '2rem' }}>
-                <label style={{ color: '#e2e8f0', display: 'block', marginBottom: '0.5rem', fontWeight: '500' }}>
+              <div style={{ marginBottom: '2rem', order: 1 }}>
+                <label style={{ 
+                  color: '#e2e8f0', 
+                  display: 'block', 
+                  marginBottom: '0.5rem', 
+                  fontWeight: '500',
+                  fontSize: window.innerWidth <= 768 ? '0.85rem' : '0.95rem'
+                }}>
                   <i className="fas fa-lock" style={{ color: '#38ef7d', marginRight: '5px' }}></i> Password
                 </label>
                 <input
@@ -196,8 +251,11 @@ export default function Login({ setUser }) {
                     border: '1px solid rgba(255,255,255,0.2)',
                     background: 'rgba(255,255,255,0.1)',
                     color: 'white',
-                    outline: 'none'
+                    outline: 'none',
+                    fontSize: window.innerWidth <= 768 ? '0.9rem' : '1rem'
                   }}
+                  onFocus={(e) => e.target.style.borderColor = '#38ef7d'}
+                  onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.2)'}
                 />
               </div>
 
@@ -211,12 +269,13 @@ export default function Login({ setUser }) {
                   border: 'none',
                   padding: '14px',
                   borderRadius: '40px',
-                  fontSize: '1rem',
+                  fontSize: window.innerWidth <= 768 ? '0.9rem' : '1rem',
                   fontWeight: '600',
                   cursor: 'pointer',
                   boxShadow: '0 4px 15px rgba(56, 239, 125, 0.3)',
                   transition: 'transform 0.2s',
-                  opacity: loading ? 0.7 : 1
+                  opacity: loading ? 0.7 : 1,
+                  order: 2
                 }}
                 onMouseEnter={(e) => (e.target.style.transform = 'scale(1.02)')}
                 onMouseLeave={(e) => (e.target.style.transform = 'scale(1)')}
