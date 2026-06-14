@@ -339,7 +339,7 @@ export default function AdminPanel({ activePanel }) {
           <div className="stat-card"><div><h3>Admin</h3><div className="number">{stats.admin}</div></div><i className="fas fa-user-shield stat-icon"></i></div>
         </div>
         <div style={{ padding: '0 28px' }}>
-          <div style={{ padding: '20px', border: '1px solid #ddd', borderRadius: '8px', marginBottom: '20px', backgroundColor: '#fff' }}>
+          <div style={{ padding: '20px', border: '1px solid #ddd', borderRadius: '8px', marginBottom: '20px', backgroundColor: '#000000ff' }}>
             <h3>Pengaturan Jam Absen</h3>
             <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
               <input 
