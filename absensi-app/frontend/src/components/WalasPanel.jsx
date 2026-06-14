@@ -200,19 +200,36 @@ export default function WalasPanel({ activePanel }) {
               </thead>
               <tbody>
                 {absensiSiswa.map((a, i) => (
-                  <td>
-                    {a.foto_kamera ? (
-                      <a
-                        href={getImageUrl(a.foto_kamera)}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                      >
-                        Lihat Foto
-                      </a>
-                    ) : (
-                      '-'
-                    )}
-                  </td>
+                  <tr key={i}>
+                    <td>{a.tanggal}</td>
+                    <td>
+                      <span className={`status-badge status-${a.status}`}>
+                        {a.status}
+                      </span>
+                    </td>
+                    <td>
+                      {a.foto_kamera ? (
+                        <a
+                          href={getImageUrl(a.foto_kamera)}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          style={{
+                            color: '#f5c518',
+                            textDecoration: 'none',
+                            fontWeight: 'bold',
+                            border: '1px solid #f5c518',
+                            padding: '4px 8px',
+                            borderRadius: '4px',
+                            fontSize: '11px'
+                          }}
+                        >
+                          <i className="fas fa-image" style={{ marginRight: '5px' }}></i>Lihat
+                        </a>
+                      ) : (
+                        <span style={{ color: '#475569' }}>-</span>
+                      )}
+                    </td>
+                  </tr>
                 ))}
               </tbody>
             </table>
