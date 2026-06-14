@@ -20,16 +20,10 @@ export default function MuridPanel({ activePanel }) {
   const [riwayat, setRiwayat] = useState([]);
   const [sudahAbsen, setSudahAbsen] = useState(false);
   const [profil, setProfil] = useState(null);
-  const videoRef = useRef(null);
-  const canvasRef = useRef(null);
-  const [stream, setStream] = useState(null);
-  const [fotoBlob, setFotoBlob] = useState(null);
-  const [previewUrl, setPreviewUrl] = useState('');
-  const [previewVisible, setPreviewVisible] = useState(false);
   const [loading, setLoading] = useState(false);
   const [selectedAbsen, setSelectedAbsen] = useState(null);
 
-  // FUNGSI SAKTI: Pembeda link Cloudinary vs Lokal
+  // FUNGSI SAKTI
   const getImageUrl = (path) => {
     if (!path) return '';
     if (path.startsWith('http')) return path;
@@ -53,6 +47,22 @@ export default function MuridPanel({ activePanel }) {
     api.get('/users/profile').then(res => setProfil(res.data)).catch(console.error);
   }, []);
 
+  // --- PANEL: ABSEN FORM ---
+  if (activePanel === 'absen-form') {
+    return (
+      <div className="panel active-panel">
+        <h2>Form Absensi</h2>
+        {sudahAbsen ? (
+          <div className="alert alert-success">Hari ini kamu sudah absen! Mantap! 🔥</div>
+        ) : (
+          <div className="alert alert-info">Silakan lakukan absensi hari ini.</div>
+        )}
+        {/* Tambahin form absen lu di bawah sini ya bray */}
+      </div>
+    );
+  }
+
+  // --- PANEL: RIWAYAT ABSEN ---
   if (activePanel === 'riwayat-absen') {
     return (
       <div className="panel active-panel">
@@ -79,27 +89,17 @@ export default function MuridPanel({ activePanel }) {
               <h3>Detail Absensi</h3>
               <p>Status: {selectedAbsen.status}</p>
               
-              {/* IMPLEMENTASI FUNGSI SAKTI DI SINI */}
               {selectedAbsen.foto_kamera && (
                 <div style={{ marginBottom: '10px' }}>
-                  <img 
-                    src={getImageUrl(selectedAbsen.foto_kamera)} 
-                    alt="Foto Kamera" 
-                    style={{ maxWidth: '100%', maxHeight: '400px', borderRadius: '8px' }}
-                  />
+                  <img src={getImageUrl(selectedAbsen.foto_kamera)} alt="Foto Kamera" style={{ maxWidth: '100%', maxHeight: '400px', borderRadius: '8px' }} />
                 </div>
               )}
               {selectedAbsen.file_path && (
                 <div style={{ marginBottom: '10px' }}>
-                  <img 
-                    src={getImageUrl(selectedAbsen.file_path)} 
-                    alt="Bukti File" 
-                    style={{ maxWidth: '100%', maxHeight: '300px', borderRadius: '8px' }}
-                    onError={(e) => { e.target.style.display = 'none'; }} 
-                  />
+                  <img src={getImageUrl(selectedAbsen.file_path)} alt="Bukti File" style={{ maxWidth: '100%', maxHeight: '300px', borderRadius: '8px' }} />
                 </div>
               )}
-              <a href={getImageUrl(selectedAbsen.file_path)} target="_blank" rel="noopener noreferrer">Download / Lihat File</a>
+              <a href={getImageUrl(selectedAbsen.file_path)} target="_blank" rel="noopener noreferrer">Lihat File</a>
               <button onClick={() => setSelectedAbsen(null)}>Tutup</button>
             </div>
           </div>
@@ -108,6 +108,7 @@ export default function MuridPanel({ activePanel }) {
     );
   }
 
+  // --- PANEL: PROFIL ---
   if (activePanel === 'profil') {
     return (
       <div className="panel active-panel">
@@ -126,5 +127,11 @@ export default function MuridPanel({ activePanel }) {
     );
   }
 
-  return <div className="panel active-panel"><h2>Absensi</h2>{/* Form absen lu di sini */}</div>;
+  // --- DEFAULT PANEL (DASHBOARD) ---
+  return (
+    <div className="panel active-panel">
+      <h2>Dashboard Murid</h2>
+      <p>Selamat datang di sistem absensi! Pilih menu di samping buat lanjut.</p>
+    </div>
+  );
 }
