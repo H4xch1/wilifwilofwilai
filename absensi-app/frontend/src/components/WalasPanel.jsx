@@ -209,29 +209,15 @@ export default function WalasPanel({ activePanel }) {
                         {a.status}
                       </span>
                     </td>
-                    <td style={{ padding: '0px' }}> {/* PADDING NOL DI SINI BIAR TOMBOL FULL */}
-                      {a.foto_kamera ? (
-                        <div
-                          onClick={() => setPreviewImage(getImageUrl(a.foto_kamera))}
-                          style={{
-                            display: 'block',
-                            width: '100%',
-                            padding: '12px 10px', // Atur padding biar tombolnya pas
-                            textAlign: 'center',
-                            background: '#f5c518',
-                            color: '#0a0c10',
-                            fontWeight: 'bold',
-                            cursor: 'pointer',
-                            fontSize: '12px',
-                            textTransform: 'uppercase',
-                            height: '100%' // Biar ngebentang tinggi
-                          }}
-                        >
-                          LIHAT FOTO
-                        </div>
-                      ) : (
-                        <span style={{ color: '#475569', display: 'block', textAlign: 'center' }}>-</span>
-                      )}
+                    <td
+                      onClick={a.foto_kamera ? () => setPreviewImage(getImageUrl(a.foto_kamera)) : undefined}
+                      style={{
+                        cursor: a.foto_kamera ? 'pointer' : 'default',
+                        textAlign: 'center',
+                        padding: '15px'
+                      }}
+                    >
+                      {a.foto_kamera ? '📷 Klik untuk lihat' : '-'}
                     </td>
                   </tr>
                 ))}
