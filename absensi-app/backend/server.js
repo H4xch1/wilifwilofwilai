@@ -9,6 +9,7 @@ import authRoutes from './routes/auth.js';
 import userRoutes from './routes/user.js';
 import absensiRoutes from './routes/absensi.js';
 import laporanRoutes from './routes/laporan.js';
+import settingsRoutes from './routes/settings.js';
 
 dotenv.config();
 
@@ -53,6 +54,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/absensi', absensiRoutes);
 app.use('/api/laporan', laporanRoutes);
+app.use('/api/settings', settingsRoutes);
 
 app.get('/api/data', (req, res) => {
   res.json({ message: "You're in!" });
