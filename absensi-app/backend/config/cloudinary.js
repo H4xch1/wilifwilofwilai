@@ -19,5 +19,11 @@ const storage = new CloudinaryStorage({
   },
 });
 
-const uploadCloud = multer({ storage: storage });
+const uploadCloud = multer({ 
+  storage: storage,
+  limits: { 
+    fileSize: 16 * 4080 * 4080 // 4MB (Jangan lebih dari 4.5MB karena Vercel bakal nge-kill request lu!)
+  } 
+});
+
 export default uploadCloud;
