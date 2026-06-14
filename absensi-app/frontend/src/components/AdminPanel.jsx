@@ -20,11 +20,12 @@ export default function AdminPanel({ activePanel }) {
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [editData, setEditData] = useState({});
   const [message, setMessage] = useState('');
+  const [jamBaru, setJamBaru] = useState('07:30');
   const chartRef = useRef(null);
   const chartInstance = useRef(null);
   const messageTimeout = useRef(null);
 
-  const kelasList = ['X PPLG 1', 'X PPLG 2', 'XI PPLG 1', 'XI PPLG 2', 'XII PPLG 1', 'XII PPLG 2', 'X DKV 1', 'X DKV 2', 'XI DKV 1', 'XI DKV 2', 'XII DKV 1', 'XII DKV 2', 'X PEMASARAN 1', 'X PEMASARAN 2', 'XI PEMASARAN 1', 'XI PEMASARAN 2', 'XII PEMASARAN 1', 'XII PEMASARAN 2', 'X MPLB 1', 'X MPLB 2', 'XI MPLB 1', 'XI MPLB 2', 'XII MPLB 1', 'XII MPLB 2' ];
+  const kelasList = ['X PPLG 1', 'X PPLG 2', 'XI PPLG 1', 'XI PPLG 2', 'XII PPLG 1', 'XII PPLG 2', 'X DKV 1', 'X DKV 2', 'XI DKV 1', 'XI DKV 2', 'XII DKV 1', 'XII DKV 2', 'X PEMASARAN 1', 'X PEMASARAN 2', 'XI PEMASARAN 1', 'XI PEMASARAN 2', 'XII PEMASARAN 1', 'XII PEMASARAN 2', 'X MPLB 1', 'X MPLB 2', 'XI MPLB 1', 'XI MPLB 2', 'XII MPLB 1', 'XII MPLB 2'];
 
   useEffect(() => {
     setMessage('');
@@ -58,6 +59,15 @@ export default function AdminPanel({ activePanel }) {
       const res = await api.get('/absensi/statistik/bulan-ini');
       if (res.data && res.data.labels && res.data.data) setChartData(res.data);
     } catch (err) { console.error(err); }
+  };
+
+  const updateJamAbsen = async () => {
+    try {
+      await api.post('/settings/jam-absen', { jam: jamBaru });
+      alert('Jam batas absen berhasil diupdate ke ' + jamBaru);
+    } catch (err) {
+      alert('Gagal update jam: ' + err.message);
+    }
   };
 
   const fetchUsers = async (role) => {
@@ -231,7 +241,7 @@ export default function AdminPanel({ activePanel }) {
     const getWaliName = (waliId) => {
       if (!waliId) return '-';
       const wali = walasList.find(w => w._id === waliId);
-      return wali ? wali.nama_lengkap : waliId; 
+      return wali ? wali.nama_lengkap : waliId;
     };
     return (
       <div className="panel active-panel">
@@ -328,6 +338,28 @@ export default function AdminPanel({ activePanel }) {
           <div className="stat-card"><div><h3>Wali Kelas</h3><div className="number">{stats.walas}</div></div><i className="fas fa-chalkboard-user stat-icon"></i></div>
           <div className="stat-card"><div><h3>Admin</h3><div className="number">{stats.admin}</div></div><i className="fas fa-user-shield stat-icon"></i></div>
         </div>
+        <div style={{ padding: '0 28px' }}>
+          <div style={{ padding: '20px', border: '1px solid #ddd', borderRadius: '8px', marginBottom: '20px', backgroundColor: '#fff' }}>
+            <h3>Pengaturan Jam Absen</h3>
+            <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+              <input 
+                type="time" 
+                value={jamBaru} 
+                onChange={(e) => setJamBaru(e.target.value)}
+                style={{ padding: '8px' }}
+              />
+              <button 
+                onClick={updateJamAbsen}
+                style={{ padding: '8px 16px', background: '#007bff', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer' }}
+              >
+                Simpan Jam Batas
+              </button>
+            </div>
+            <p style={{ fontSize: '12px', color: '#666', marginTop: '10px' }}>
+              *Admin bisa atur jam batas absensi di sini. Murid nggak bakal bisa absen lewat dari jam ini.
+            </p>
+          </div>
+        </div>
         <div style={{ padding: '0 28px 24px 28px' }}>
           <div className="stat-card" style={{ padding: '0', border: 'none', boxShadow: 'none', backgroundColor: 'transparent' }}>
             <canvas ref={chartRef} style={{ width: '100%', height: '200px' }}></canvas>
@@ -365,7 +397,7 @@ export default function AdminPanel({ activePanel }) {
               <div className="form-group"><label>NIK</label><input type="text" name="nik_edit" defaultValue={editData.nik} required /></div>
               <div className="form-group"><label>NIS</label><input type="text" name="nis_edit" defaultValue={editData.nis || ''} /></div>
               <div className="form-group"><label>Tgl Lahir</label><input type="date" name="tanggal_lahir_edit" defaultValue={editData.tanggal_lahir ? editData.tanggal_lahir.split('T')[0] : ''} /></div>
-              
+
               {activePanel === 'manage-siswa' && (
                 <>
                   <div className="form-group">
