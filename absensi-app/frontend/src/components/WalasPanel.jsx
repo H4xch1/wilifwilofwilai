@@ -30,6 +30,8 @@ export default function WalasPanel({ activePanel }) {
   const [loading, setLoading] = useState(false);
   const [selectedSiswa, setSelectedSiswa] = useState(null); // modal detail siswa
 
+  const [previewImage, setPreviewImage] = useState(null);
+
   const getImageUrl = (url) => {
     if (!url) return '';
     // Kalau URL udah ada http-nya (Cloudinary), jangan diapa-apain!
@@ -209,24 +211,26 @@ export default function WalasPanel({ activePanel }) {
                     </td>
                     <td>
                       {a.foto_kamera ? (
-                        <a
-                          href={getImageUrl(a.foto_kamera)}
-                          target="_blank"
-                          rel="noopener noreferrer"
+                        <div
+                          onClick={() => setPreviewImage(getImageUrl(a.foto_kamera))}
                           style={{
-                            color: '#f5c518',
-                            textDecoration: 'none',
+                            display: 'block',
+                            width: '100%',
+                            padding: '10px',
+                            textAlign: 'center',
+                            background: '#f5c518',
+                            color: '#0a0c10',
                             fontWeight: 'bold',
-                            border: '1px solid #f5c518',
-                            padding: '4px 8px',
+                            cursor: 'pointer',
                             borderRadius: '4px',
-                            fontSize: '11px'
+                            fontSize: '12px',
+                            textTransform: 'uppercase'
                           }}
                         >
-                          <i className="fas fa-image" style={{ marginRight: '5px' }}></i>Lihat
-                        </a>
+                          Lihat Foto
+                        </div>
                       ) : (
-                        <span style={{ color: '#475569' }}>-</span>
+                        <span style={{ color: '#475569', display: 'block', textAlign: 'center' }}>-</span>
                       )}
                     </td>
                   </tr>
@@ -237,6 +241,21 @@ export default function WalasPanel({ activePanel }) {
           <button className="btn-submit" style={{ marginTop: '15px' }} onClick={handleBackToSiswa}>
             ← Kembali ke Siswa Bimbingan
           </button>
+          {/* --- TARUH MODALNYA DI SINI BRAY --- */}
+          {previewImage && (
+            <div
+              style={{
+                position: 'fixed', top: 0, left: 0, width: '100%', height: '100%',
+                background: 'rgba(0,0,0,0.9)', zIndex: 9999,
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                cursor: 'pointer'
+              }}
+              onClick={() => setPreviewImage(null)}
+            >
+              <img src={previewImage} style={{ maxWidth: '90%', maxHeight: '90%', borderRadius: '8px' }} />
+              <span style={{ position: 'absolute', top: 20, right: 20, color: '#fff', fontSize: '20px' }}>× Close</span>
+            </div>
+          )}
         </div>
       );
     }
