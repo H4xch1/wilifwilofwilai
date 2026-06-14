@@ -38,7 +38,23 @@ router.post('/', verifyToken, checkRole('murid'), upload.fields([
   { name: 'foto_kamera', maxCount: 1 }
 ]), async (req, res) => {
   try {
+    // --- TAMBAHAN: CEK BATAS WAKTU ---
+    const setting = await Settings.findOne({ key: 'jam_batas_absen' });
+    const batas = setting ? setting.value : '07:30'; // Default kalau belum diatur
+    const [h, m] = batas.split(':');
+    
+    const sekarang = new Date();
+    // Konversi WIB kalau server lu timezone-nya bukan WIB
+    const jamSekarang = sekarang.getHours(); 
+    const menitSekarang = sekarang.getMinutes();
+
+    if (jamSekarang > parseInt(h) || (jamSekarang === parseInt(h) && menitSekarang > parseInt(m))) {
+      return res.status(400).json({ message: `Waduh, telat bray! Absen udah ditutup dari jam ${batas}.` });
+    }
+    // --- AKHIR VALIDASI ---
+
     const { status, keterangan } = req.body;
+    // ... lanjut kode existing lu ...
     const tanggal = new Date().toISOString().split('T')[0];
     const userId = req.user.userId;
 

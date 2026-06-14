@@ -20,7 +20,7 @@ export default function MuridPanel({ activePanel }) {
   const [riwayat, setRiwayat] = useState([]);
   const [sudahAbsen, setSudahAbsen] = useState(false);
   const [profil, setProfil] = useState(null);
-  
+
   // Ref & State Kamera
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
@@ -28,8 +28,9 @@ export default function MuridPanel({ activePanel }) {
   const [fotoBlob, setFotoBlob] = useState(null);
   const [previewUrl, setPreviewUrl] = useState('');
   const [previewVisible, setPreviewVisible] = useState(false);
-  
+
   const [loading, setLoading] = useState(false);
+  const [jamBatas, setJamBatas] = useState('07:30');
   const [selectedAbsen, setSelectedAbsen] = useState(null);
 
   // Helper biar URL gambar nggak error
@@ -37,6 +38,12 @@ export default function MuridPanel({ activePanel }) {
     if (!path) return '';
     if (path.startsWith('http')) return path;
     return `${API_URL.replace('/api', '')}/${path}`;
+  };
+
+  const isLate = () => {
+    const [h, m] = jamBatas.split(':');
+    const sekarang = new Date();
+    return sekarang.getHours() > parseInt(h) || (sekarang.getHours() === parseInt(h) && sekarang.getMinutes() > parseInt(m));
   };
 
   const checkSudahAbsen = async () => {
@@ -96,7 +103,7 @@ export default function MuridPanel({ activePanel }) {
     canvas.width = video.videoWidth;
     canvas.height = video.videoHeight;
     ctx.drawImage(video, 0, 0);
-    
+
     canvas.toBlob((blob) => {
       if (blob) {
         setFotoBlob(blob);
@@ -105,7 +112,7 @@ export default function MuridPanel({ activePanel }) {
         setPreviewVisible(true);
       }
     }, 'image/png');
-    
+
     if (stream) {
       stream.getTracks().forEach(t => t.stop());
       setStream(null);
@@ -173,6 +180,18 @@ export default function MuridPanel({ activePanel }) {
     };
   }, [activePanel]);
 
+  useEffect(() => {
+    const fetchSettings = async () => {
+      try {
+        const res = await api.get('/settings/jam-absen');
+        setJamBatas(res.data.jam_batas);
+      } catch (err) {
+        console.error("Gagal load settingan:", err);
+      }
+    };
+    fetchSettings();
+  }, []);
+
   // --- RENDERING ---
 
   if (activePanel === 'dashboard') {
@@ -231,8 +250,16 @@ export default function MuridPanel({ activePanel }) {
                 <label>📝 Keterangan (opsional)</label>
                 <textarea name="keterangan" rows="2"></textarea>
               </div>
-              <button type="submit" className="btn-submit" disabled={loading}>
-                {loading ? 'Memproses...' : 'Simpan Absensi'}
+              // Cari tombol absen lu, biasanya di dalam form
+              <button
+                type="submit"
+                disabled={loading || isLate()} // TAMBAH ISLATE DI SINI
+                style={{
+                  background: (loading || isLate()) ? '#ccc' : '#007bff', // Tombol bakal abu-abu kalau telat
+                  cursor: (loading || isLate()) ? 'not-allowed' : 'pointer'
+                }}
+              >
+                {isLate() ? 'Absen Ditutup' : (loading ? 'Loading...' : 'Kirim Absensi')}
               </button>
             </form>
           </>
@@ -276,33 +303,33 @@ export default function MuridPanel({ activePanel }) {
               <p><strong>Sesi:</strong> {selectedAbsen.sesi ? (selectedAbsen.sesi === 'masuk' ? 'Masuk (Pagi)' : 'Pulang (Sore)') : '-'}</p>
               <p><strong>Status:</strong> {selectedAbsen.status}</p>
               <p><strong>Keterangan:</strong> {selectedAbsen.keterangan || '-'}</p>
-              
+
               {selectedAbsen.foto_kamera && (
                 <div style={{ marginBottom: '20px' }}>
                   <strong>Foto Kamera:</strong>
                   <div style={{ marginTop: '10px' }}>
-                    <img 
-                      src={getImageUrl(selectedAbsen.foto_kamera)} 
-                      alt="Foto Absen" 
-                      style={{ maxWidth: '100%', maxHeight: '400px', borderRadius: '8px' }} 
+                    <img
+                      src={getImageUrl(selectedAbsen.foto_kamera)}
+                      alt="Foto Absen"
+                      style={{ maxWidth: '100%', maxHeight: '400px', borderRadius: '8px' }}
                       onError={(e) => { e.target.src = 'https://via.placeholder.com/400?text=Foto+tidak+ditemukan'; }}
                     />
                   </div>
                   <a href={getImageUrl(selectedAbsen.foto_kamera)} target="_blank" rel="noopener noreferrer">Buka di tab baru</a>
                 </div>
               )}
-              
+
               {selectedAbsen.file_path && (
                 <div>
                   <strong>File Bukti:</strong>
                   <div style={{ marginTop: '10px' }}>
                     {/\.(jpg|jpeg|png|gif|webp)$/i.test(selectedAbsen.file_path) ? (
                       <div style={{ marginBottom: '10px' }}>
-                        <img 
-                          src={getImageUrl(selectedAbsen.file_path)} 
-                          alt="Bukti File" 
+                        <img
+                          src={getImageUrl(selectedAbsen.file_path)}
+                          alt="Bukti File"
                           style={{ maxWidth: '100%', maxHeight: '300px', borderRadius: '8px' }}
-                          onError={(e) => { e.target.style.display = 'none'; }} 
+                          onError={(e) => { e.target.style.display = 'none'; }}
                         />
                       </div>
                     ) : null}
