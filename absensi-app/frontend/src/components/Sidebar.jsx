@@ -78,21 +78,17 @@ export default function Sidebar({ user, activePanel, setActivePanel }) {
     }
   };
 
+  // Desktop only
+  if (isMobile) return null;
+
   return (
     <>
-      {isMobile && !isExpanded && (
-        <button className="global-hamburger" onClick={toggleSidebar}>
-          <i className="fas fa-bars"></i>
-        </button>
-      )}
-
       <div className={sidebarClass}>
         <div className="sidebar-header">
           <button className="hamburger-btn" onClick={toggleSidebar}>
             <i className="fas fa-bars"></i>
           </button>
 
-          {/* Logo gambar - tampil baik expand maupun collapse (tanpa ikon daun) */}
           <img
             src="/images/logo/logo-navbar.png"
             alt="Logo"
