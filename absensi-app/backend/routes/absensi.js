@@ -4,6 +4,7 @@ import { v2 as cloudinary } from 'cloudinary';
 import { CloudinaryStorage } from 'multer-storage-cloudinary';
 import { verifyToken, checkRole } from '../middleware/auth.js';
 import Absensi from '../models/Absensi.js';
+import Settings from '../models/settings.js';
 import User from '../models/User.js';
 
 const router = express.Router();

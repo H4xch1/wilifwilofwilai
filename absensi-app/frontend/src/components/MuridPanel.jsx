@@ -250,12 +250,11 @@ export default function MuridPanel({ activePanel }) {
                 <label>📝 Keterangan (opsional)</label>
                 <textarea name="keterangan" rows="2"></textarea>
               </div>
-              // Cari tombol absen lu, biasanya di dalam form
               <button
                 type="submit"
-                disabled={loading || isLate()} // TAMBAH ISLATE DI SINI
+                disabled={loading || isLate()}
                 style={{
-                  background: (loading || isLate()) ? '#ccc' : '#007bff', // Tombol bakal abu-abu kalau telat
+                  background: (loading || isLate()) ? '#ccc' : '#007bff',
                   cursor: (loading || isLate()) ? 'not-allowed' : 'pointer'
                 }}
               >
